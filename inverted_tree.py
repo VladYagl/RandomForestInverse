@@ -33,7 +33,7 @@ class InvertedTree(DecisionTreeRegressor):
             self.value = self.tree.value[self.index][0][0]
             self.is_leaf = left_index == right_index == -1
 
-    def dfs(self, node):
+    def dfs(self, node, extr):
         if node is None:
             raise Exception("WTF")
 
@@ -41,16 +41,17 @@ class InvertedTree(DecisionTreeRegressor):
             features = self.tree_.n_features
             return InvertedTree.Value(node.value, [-float64('inf')] * features, [float64('inf')] * features)
         else:
-            left = self.dfs(node.left)
-            right = self.dfs(node.right)
+            left = self.dfs(node.left, extr)
+            right = self.dfs(node.right, extr)
 
-            if left.value < right.value:
+            if left.value < right.value and extr == 'min':
                 left.upper[node.feature] = min(left.upper[node.feature], node.threshold)
                 return left
             else:
                 right.lower[node.feature] = max(right.lower[node.feature], node.threshold)
                 return right
 
-    def inverse(self):
-        print(self.dfs(self.Node(self.tree_, 0)))
+    def inverse(self, extr='min'):
+        value = self.dfs(self.Node(self.tree_, 0), extr)
+        return value
 
