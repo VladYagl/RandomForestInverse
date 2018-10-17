@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.widgets import CheckButtons
 
 
 # x = np.linspace(0, 2, 100)
@@ -17,7 +16,8 @@ from matplotlib.widgets import CheckButtons
 #
 # plt.show()
 
-def visualise(value, data, names, feature_x=2, feature_y=3):
+def visualise(value, data, feature_x=2, feature_y=3):
+    print("feature_x", feature_x, "feature_y", feature_y)
     plt.cla()
 
     x = data[:, feature_x]
@@ -37,22 +37,6 @@ def visualise(value, data, names, feature_x=2, feature_y=3):
     plt.xlim([minx, maxx])
     plt.ylim([miny, maxy])
 
-    print(x1, x2, y1, y2)
-
     plt.fill([x1, x2, x2, x1], [y1, y1, y2, y2], alpha=0.5, color='red')
-
-    axes = plt.gca()
-    rax = plt.axes([0, 0, 0.5, 0.5])
-    check = CheckButtons(rax, names)
-
-    def func(label):
-        index = names.index(label)
-        rax.clear()
-        print("vis", index)
-        visualise(value, data, names, index, feature_y)
-
-    check.on_clicked(func)
-
-    plt.sca(axes)
     plt.show()
 
