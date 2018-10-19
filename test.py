@@ -14,7 +14,7 @@ y = dataset.target
 tree = InvertedTree()
 tree.fit(X, y)
 
-value = tree.inverse('max')
+value = tree.inverse('min')
 print(value)
 print()
 print("features: ", dataset.feature_names)
