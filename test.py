@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 dataset = datasets.load_diabetes()
 # dataset = datasets.load_boston()
+# dataset = datasets.load_iris()
 
 features = dataset.feature_names
 X = dataset.data
@@ -14,8 +15,9 @@ y = dataset.target
 tree = InvertedTree()
 tree.fit(X, y)
 
-value = tree.inverse('min')
-print(value)
+min_value = tree.inverse('min')
+max_value = tree.inverse('max')
+print(min_value)
 print()
 print("features: ", dataset.feature_names)
 
@@ -30,7 +32,7 @@ def select_x(label):
     else:
         feature_x = features.tolist().index(label)
     plt.sca(plot_axes)
-    visualise(value, X, feature_x, feature_y)
+    visualise(min_value, max_value, X, feature_x, feature_y)
 
 
 def select_y(label):
@@ -40,7 +42,7 @@ def select_y(label):
     else:
         feature_y = features.tolist().index(label)
     plt.sca(plot_axes)
-    visualise(value, X, feature_x, feature_y)
+    visualise(min_value, max_value, X, feature_x, feature_y)
 
 
 f, (plot_axes) = plt.subplots()
@@ -48,6 +50,9 @@ f, (plot_axes) = plt.subplots()
 f_menu, (x_axes, y_axes) = plt.subplots(2, 1, figsize=(3.2, 4.8))
 check_x = RadioButtons(x_axes, features, feature_x)
 check_y = RadioButtons(y_axes, features, feature_y)
+
+x_axes.set_title('green - min, red - max')
+
 
 check_x.on_clicked(select_x)
 check_y.on_clicked(select_y)
