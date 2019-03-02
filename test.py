@@ -13,10 +13,10 @@ dataset = datasets.load_diabetes()
 features = dataset.feature_names
 X = dataset.data
 y = dataset.target
-tree = InvertedTree()
+tree = InvertedTree(random_state=1488)
 tree.fit(X, y)
 
-forest = InvertedForest()
+forest = InvertedForest(random_state=1337)
 forest.fit(X, y)
 # print("\n".join([str(tree) for tree in forest.trees]))
 min_rect = intersect_trees(forest.trees, 'min')
@@ -27,12 +27,13 @@ print(max_rect.is_empty())
 # min_value, min_rect = tree.inverse('min')
 # max_value, max_rect = tree.inverse('max')
 # print(min_value)
+
 print(min_rect)
 print()
 print("features: ", dataset.feature_names)
 
-feature_x = 2
-feature_y = 3
+feature_x = 8
+feature_y = 9
 
 
 def select_x(label):
@@ -42,7 +43,7 @@ def select_x(label):
     else:
         feature_x = features.tolist().index(label)
     plt.sca(plot_axes)
-    visualise(min_rect, max_rect, X, feature_x, feature_y)
+    visualise(min_rect, max_rect, X, feature_x, feature_y, dataset.feature_names)
 
 
 def select_y(label):
@@ -52,7 +53,7 @@ def select_y(label):
     else:
         feature_y = features.tolist().index(label)
     plt.sca(plot_axes)
-    visualise(min_rect, max_rect, X, feature_x, feature_y)
+    visualise(min_rect, max_rect, X, feature_x, feature_y, dataset.feature_names)
 
 
 f, (plot_axes) = plt.subplots()

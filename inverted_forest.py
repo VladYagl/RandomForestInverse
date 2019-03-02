@@ -4,8 +4,8 @@ from inverted_tree import InvertedTree
 
 
 class InvertedForest(RandomForestRegressor):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.base_estimator = InvertedTree()
         print(self.base_estimator)
 
