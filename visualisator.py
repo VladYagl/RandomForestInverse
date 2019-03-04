@@ -1,34 +1,69 @@
+from matplotlib.widgets import RadioButtons
+
 import matplotlib.pyplot as plt
 
+class Visualiser:
 
-def area(rect, feature_x, feature_y, minx, maxx, miny, maxy, color):
-    x1 = max(rect.lower[feature_x], minx)
-    x2 = min(rect.upper[feature_x], maxx)
+    def select_x(self, label):
+        self.feature_x = self.feature_names.index(label)
+        plt.sca(self.plot_axes)
+        self.show_cut()
 
-    y1 = max(rect.lower[feature_y], miny)
-    y2 = min(rect.upper[feature_y], maxy)
+    def select_y(self, label):
+        self.feature_y = self.feature_names.index(label)
+        plt.sca(self.plot_axes)
+        self.show_cut()
 
-    if x1 < x2 and y1 < y2:
-        plt.xlim([minx, maxx])
-        plt.ylim([miny, maxy])
+    def __init__(self, data, min_rect, max_rect, feature_x, feature_y, feature_names):
+        self.feature_x = feature_x
+        self.feature_y = feature_y
+        self.min_rect = min_rect
+        self.max_rect = max_rect
+        self.data = data
+        if isinstance(feature_names, list):
+            self.feature_names = feature_names
+        else:
+            self.feature_names = feature_names.tolist()
 
-        plt.fill([x1, x2, x2, x1], [y1, y1, y2, y2], alpha=0.5, color=color)
+        f, (self.plot_axes) = plt.subplots()
+        f_menu, (x_axes, y_axes) = plt.subplots(2, 1, figsize=(3.2, 4.8))
+        check_x = RadioButtons(x_axes, self.feature_names, self.feature_x)
+        check_y = RadioButtons(y_axes, self.feature_names, self.feature_y)
+
+        x_axes.set_title('green - min, red - max')
+
+        check_x.on_clicked(self.select_x)
+        check_y.on_clicked(self.select_y)
+        plt.sca(self.plot_axes)
+        self.select_x(self.feature_names[self.feature_x])
 
 
-def visualise(min_rect, max_rect, data, feature_x=2, feature_y=3, feature_names=[]):
-    print("feature_x", feature_x, "feature_y", feature_y)
-    plt.cla()
-    ax = plt.gca()
-    ax.set_xlabel(feature_names[feature_x])
-    ax.set_ylabel(feature_names[feature_y])
+    def area(self, rect, minx, maxx, miny, maxy, color):
+        x1 = max(rect.lower[self.feature_x], minx)
+        x2 = min(rect.upper[self.feature_x], maxx)
 
-    x = data[:, feature_x]
-    y = data[:, feature_y]
-    plt.scatter(x, y, s=5)
+        y1 = max(rect.lower[self.feature_y], miny)
+        y2 = min(rect.upper[self.feature_y], maxy)
 
-    [minx, maxx] = plt.xlim()
-    [miny, maxy] = plt.ylim()
+        if x1 < x2 and y1 < y2:
+            plt.xlim([minx, maxx])
+            plt.ylim([miny, maxy])
 
-    area(min_rect, feature_x, feature_y, minx, maxx, miny, maxy, 'green')
-    area(max_rect, feature_x, feature_y, minx, maxx, miny, maxy, 'red')
-    plt.show()
+            plt.fill([x1, x2, x2, x1], [y1, y1, y2, y2], alpha=0.5, color=color)
+
+    def show_cut(self):
+        plt.cla()
+        ax = plt.gca()
+        ax.set_xlabel(self.feature_names[self.feature_x])
+        ax.set_ylabel(self.feature_names[self.feature_y])
+
+        x = self.data[:, self.feature_x]
+        y = self.data[:, self.feature_y]
+        plt.scatter(x, y, s=5)
+
+        [minx, maxx] = plt.xlim()
+        [miny, maxy] = plt.ylim()
+
+        self.area(self.min_rect, minx, maxx, miny, maxy, 'green')
+        self.area(self.max_rect, minx, maxx, miny, maxy, 'red')
+        plt.show()

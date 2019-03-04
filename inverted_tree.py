@@ -5,6 +5,8 @@ from typing import List
 
 import numpy as np
 
+inf = float64('inf')
+
 
 class Rect:
     @property
@@ -32,34 +34,29 @@ def intersect(rects: List[Rect]):
     #     return None
     return rect
 
+class Node:
+    def __init__(self, tree, index):
+        self.tree = tree
+        self.index = index
 
-def intersect_trees(trees, extr='min'):
-    rects = [tree.inverse(extr)[1] for tree in trees]
-    return intersect(rects)
+        left_index = self.tree.children_left[self.index]
+        right_index = self.tree.children_right[self.index]
 
+        if left_index == -1:
+            self.left = None
+        else:
+            self.left = Node(self.tree, left_index)
+        if right_index == -1:
+            self.right = None
+        else:
+            self.right = Node(self.tree, right_index)
+
+        self.feature = self.tree.feature[self.index]
+        self.threshold = self.tree.threshold[self.index]
+        self.value = self.tree.value[self.index][0][0]
+        self.is_leaf = left_index == right_index == -1
 
 class InvertedTree(DecisionTreeRegressor):
-    class Node:
-        def __init__(self, tree, index):
-            self.tree = tree
-            self.index = index
-
-            left_index = self.tree.children_left[self.index]
-            right_index = self.tree.children_right[self.index]
-
-            if left_index == -1:
-                self.left = None
-            else:
-                self.left = InvertedTree.Node(self.tree, left_index)
-            if right_index == -1:
-                self.right = None
-            else:
-                self.right = InvertedTree.Node(self.tree, right_index)
-
-            self.feature = self.tree.feature[self.index]
-            self.threshold = self.tree.threshold[self.index]
-            self.value = self.tree.value[self.index][0][0]
-            self.is_leaf = left_index == right_index == -1
 
     def dfs(self, node, extr, limits):
         if node is None:
@@ -67,7 +64,7 @@ class InvertedTree(DecisionTreeRegressor):
 
         if node.is_leaf:
             features = self.tree_.n_features
-            return node.value, Rect([-float64('inf')] * features, [float64('inf')] * features)
+            return node.value, Rect([-inf] * features, [+inf] * features)
         else:
             left_value, left = self.dfs(node.left, extr, limits)
             right_value, right = self.dfs(node.right, extr, limits)
@@ -88,6 +85,10 @@ class InvertedTree(DecisionTreeRegressor):
                 right.lower[node.feature] = max(right.lower[node.feature], node.threshold)
                 return right_value, right
 
+    @property
+    def root(self):
+        return Node(self.tree_, 0)
+
     def inverse(self, extr='min', limits = {}):
-        value = self.dfs(self.Node(self.tree_, 0), extr, limits)
+        value = self.dfs(self.root, extr, limits)
         return value
