@@ -14,12 +14,15 @@ class Visualiser:
         plt.sca(self.plot_axes)
         self.show_cut()
 
-    def __init__(self, data, min_rect, max_rect, feature_x, feature_y, feature_names):
+    def __init__(self, data, target, min_value, max_value, min_rect, max_rect, feature_x, feature_y, feature_names):
         self.feature_x = feature_x
         self.feature_y = feature_y
         self.min_rect = min_rect
         self.max_rect = max_rect
+        self.min_value = min_value
+        self.max_value = max_value
         self.data = data
+        self.target = target
         if isinstance(feature_names, list):
             self.feature_names = feature_names
         else:

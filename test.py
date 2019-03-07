@@ -1,11 +1,15 @@
 from inverted_forest import InvertedForest
-from inverted_tree import InvertedTree
+from inverted_tree import InvertedTree, Rect
 from visualisator import Visualiser
 from sklearn import datasets
+from subprocess import Popen, PIPE
+
+import numpy as np
 
 def run_tree(X, y, random_state=None):
     tree = InvertedTree(random_state=1488)
     tree.fit(X, y)
+    # print(tree.dump())
     min_value, min_rect = tree.inverse('min')
     max_value, max_rect = tree.inverse('max')
     return min_value, max_value, min_rect, max_rect
@@ -16,7 +20,10 @@ def prep_forest(X, y, random_state):
     # forest = InvertedForest(n_estimators=2)
     forest = InvertedForest(random_state=random_state)
     forest.fit(X, y)
-    print("Number of trees: " + str(len(forest.trees)))
+    print("Number of trees: ", len(forest.trees))
+    # print("\n\n\n--------------------------------------")
+    # print(forest.dump())
+    # print("--------------------------------------\n\n\n")
     return forest
 
 
@@ -32,9 +39,35 @@ def run_slow_forest(X, y, random_state=None):
     max_value, max_rect = forest.inverse('max')
     return min_value, max_value, min_rect, max_rect
 
+def run_other(X, y, name, random_state=None):
+    def call(expr):
+        print("\n--------------------------------------")
+        other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
+        out, err = other.communicate(expr + '\n' + forest.dump())
+        print("\n--------------------------------------\n")
+        print("error =", err)
+        print("output =", out)
+        split = out.split()
+        value = split[0]
+        odd = split[1::2]
+        even = split[2::2]
+        odd = np.fromstring(" ".join(odd), dtype=np.float64, sep=' ')
+        even = np.fromstring(" ".join(even), dtype=np.float64, sep=' ')
+        rect = Rect(odd, even)
+        return value, rect
+
+
+    forest = prep_forest(X, y, random_state)
+    min_value, min_rect = call('min')
+    max_value, max_rect = call('max')
+
+    # f = open("test_forest.txt", "w")
+    # f.write('min\n' + forest.dump()) 
+    return min_value, max_value, min_rect, max_rect
+
 
 # dataset = datasets.load_diabetes()
-dataset = datasets.load_boston()
+# dataset = datasets.load_boston()
 # dataset = datasets.load_iris()
 
 sets = [
@@ -48,21 +81,33 @@ funcs = [
         run_slow_forest
         ]
 
-for dataset in sets:
-    for func in funcs:
-        print("     ==next==\n")
-        for state in range(5):
-            print("---> " + repr(func))
-            X = dataset.data
-            y = dataset.target
+# for dataset in sets:
+#     for func in funcs:
+#         print("     ==next==\n")
+#         for state in range(5):
+#             print("--->", func)
+#             X = dataset.data
+#             y = dataset.target
 
-            min_value, max_value, min_rect, max_rect = func(X, y, state)
+#             min_value, max_value, min_rect, max_rect = func(X, y, state)
 
-            print("Mininmum rect: " + ("OK" if not min_rect.is_empty() else "FAIL") + " value: " + str(min_value))
-            print("Maximum rect: " + ("OK" if not max_rect.is_empty() else "FAIL") + " value: " + str(max_value))
-            print()
+#             print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
+#             print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
+#             print()
 
 
+print("\n\n")
+dataset = datasets.load_diabetes()
+# dataset = datasets.load_boston()
+# dataset = datasets.load_iris()
+X = dataset.data
+y = dataset.target
 
-visualiser = Visualiser(X, min_rect, max_rect, 0, 1, dataset.feature_names)
+# min_value, max_value, min_rect, max_rect = run_slow_forest(X, y)
+# min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
+min_value, max_value, min_rect, max_rect = run_other(X, y, "./daddy")
 
+print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
+print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
+
+visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 0, 1, dataset.feature_names)

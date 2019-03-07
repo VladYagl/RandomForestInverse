@@ -31,7 +31,7 @@ class InvertedForest(RandomForestRegressor):
         if not rect.is_empty():
             value = sum([pair[0] for pair in inverse]) / self.n_estimators
             # if value != true_value:
-                # print(str(value) + " != " + str(true_value))
+                # print(value, " != ", true_value)
                 # assert(value == true_value)
         return true_value, rect
 
@@ -40,6 +40,8 @@ class InvertedForest(RandomForestRegressor):
         if not rect.is_empty() or node.is_leaf:
             return value, rect
         else:
+            if node.feature == 1:
+                print(node.threshold)
             if node.feature not in limits:
                 limits[node.feature] = (-inf, +inf)
             left_limits = limits.copy()
@@ -56,4 +58,7 @@ class InvertedForest(RandomForestRegressor):
 
     def inverse(self, extr='min'):
         return self.intersect_dfs(self.trees[0].root, {}, extr)
+
+    def dump(self):
+        return  str(self.n_features_) + " " + str(self.n_estimators) + "\n" + "\n\n".join([str(tree.size) + "\n" + tree.dump() for tree in self.trees])
 

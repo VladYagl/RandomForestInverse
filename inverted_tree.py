@@ -39,22 +39,45 @@ class Node:
         self.tree = tree
         self.index = index
 
-        left_index = self.tree.children_left[self.index]
-        right_index = self.tree.children_right[self.index]
+        self.left_index = self.tree.children_left[self.index]
+        self.right_index = self.tree.children_right[self.index]
 
-        if left_index == -1:
+        if self.left_index == -1:
             self.left = None
         else:
-            self.left = Node(self.tree, left_index)
-        if right_index == -1:
+            self.left = Node(self.tree, self.left_index)
+        if self.right_index == -1:
             self.right = None
         else:
-            self.right = Node(self.tree, right_index)
+            self.right = Node(self.tree, self.right_index)
 
         self.feature = self.tree.feature[self.index]
         self.threshold = self.tree.threshold[self.index]
         self.value = self.tree.value[self.index][0][0]
-        self.is_leaf = left_index == right_index == -1
+        self.is_leaf = self.left_index == self.right_index == -1
+        if self.is_leaf:
+            self.size = 1
+        else:
+            self.size = self.left.size + self.right.size + 1
+
+    def dump(self):
+        info = [
+                self.index,
+                self.feature,
+                self.threshold,
+                self.value,
+                self.left_index,
+                self.right_index
+                ]
+        if not self.is_leaf:
+            result = [
+                    " ".join(map(str, info)),
+                    self.left.dump(),
+                    self.right.dump()
+                    ]
+            return "\n".join(result)
+        else:
+            return " ".join(map(str, info))
 
 class InvertedTree(DecisionTreeRegressor):
 
@@ -89,6 +112,13 @@ class InvertedTree(DecisionTreeRegressor):
     def root(self):
         return Node(self.tree_, 0)
 
+    @property
+    def size(self):
+        return self.root.size
+
     def inverse(self, extr='min', limits = {}):
         value = self.dfs(self.root, extr, limits)
         return value
+
+    def dump(self):
+        return self.root.dump()
