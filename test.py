@@ -5,6 +5,7 @@ from sklearn import datasets
 from subprocess import Popen, PIPE
 
 import numpy as np
+import time
 
 def run_tree(X, y, random_state=None):
     tree = InvertedTree(random_state=1488)
@@ -43,17 +44,28 @@ def run_other(X, y, name, random_state=None):
     def call(expr):
         print("\n--------------------------------------")
         other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
+        start_time = time.time()
         out, err = other.communicate(expr + '\n' + forest.dump())
+        elapsed_time = time.time() - start_time
         print("\n--------------------------------------\n")
         print("error =", err)
+        print("time = ", elapsed_time)
         print("output =", out)
         split = out.split()
-        value = split[0]
+        value = np.float64(split[0])
         odd = split[1::2]
         even = split[2::2]
         odd = np.fromstring(" ".join(odd), dtype=np.float64, sep=' ')
         even = np.fromstring(" ".join(even), dtype=np.float64, sep=' ')
         rect = Rect(odd, even)
+
+        point = [(limit[0] + limit[1]) / 2 for limit in rect.bounds]
+        point = [(0 if np.isnan(x) else x) for x in point]
+        point = [(-1 if np.isneginf(x) else x) for x in point]
+        point = [(1000 if np.isinf(x) else x) for x in point]
+        X = np.array(point).reshape(-1, forest.n_features_)
+        true_value = forest.predict(X)[0]
+        assert abs(value - true_value) < value * 1e-8, "value = " + str(value) + ", true_value = " + str(true_value) + "\npoint = " + np.array2string(X, max_line_width=1000, formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=",")
         return value, rect
 
 
@@ -105,7 +117,11 @@ y = dataset.target
 
 # min_value, max_value, min_rect, max_rect = run_slow_forest(X, y)
 # min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
-min_value, max_value, min_rect, max_rect = run_other(X, y, "./daddy")
+# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state = 11)
+
+for state in range(100):
+    print (" ---- [", state, "] ----")
+    min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=state)
 
 print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
 print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)

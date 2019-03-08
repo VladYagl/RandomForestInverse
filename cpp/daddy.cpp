@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "rect.h"
+
 using namespace std;
 
 size_t forest_size;
@@ -34,15 +36,23 @@ double worst(double a, double b) {
 }
 
 struct node {
-    int index, feature;
+    size_t index, size;
+    int feature;
     node *left, *right;
     double threshold, value, shit;
     int left_index, right_index;
 
-    node(int index, int feature, double threshold, double value, int left_index, int right_index)
-        : index(index), feature(feature), threshold(threshold), value(value), shit(value), left_index(left_index), right_index(right_index) {
+    node(size_t index, int feature, double threshold, double value, int left_index, int right_index)
+        : index(index),
+          feature(feature),
+          threshold(threshold),
+          value(value),
+          shit(value),
+          left_index(left_index),
+          right_index(right_index) {
         left = nullptr;
         right = nullptr;
+        size = 1;
     }
 
     void precalc() {
@@ -51,6 +61,7 @@ struct node {
         right->precalc();
         value = best(left->value, right->value);
         shit = worst(left->shit, right->shit);
+        size = left->size + right->size;
     }
 
     bool is_leaf() {
@@ -58,45 +69,13 @@ struct node {
     }
 };
 
-struct rect {
-    double *lower, *upper;
-
-    rect() {
-    }
-
-    rect(int n_features) {
-        lower = new double[n_features];
-        upper = new double[n_features];
-        fill(lower, &lower[n_features], -numeric_limits<double>::infinity());
-        fill(upper, &upper[n_features], numeric_limits<double>::infinity());
-    }
-
-    void set(int feature, pair<double, double> border) {
-        lower[feature] = border.first;
-        upper[feature] = border.second;
-    }
-
-    void print(FILE* stream) {
-        fprintf(stream, "\n");
-        for (size_t i = 0; i < n_features; i++) {
-            fprintf(stream, "    %lf\t%lf\n", lower[i], upper[i]);
-        }
-        fprintf(stream, "\n");
-    }
-
-    void copy(const rect& rhs) {
-        for (size_t i = 0; i < n_features; i++) {
-            lower[i] = rhs.lower[i];
-            upper[i] = rhs.upper[i];
-        }
-    };
-};
-
 vector<node*> nodes;
 vector<node*> trees;
 rect current;
 rect ans;
 double ans_value;
+size_t split_count = 0;
+size_t bad_count  = 0;
 
 void solve() {
     size_t max_pos = -1;
@@ -112,6 +91,25 @@ void solve() {
             if (diff > max_diff) {
                 max_diff = diff;
                 max_pos = i;
+            }
+        }
+    }
+
+    // make all intersect current
+    for (size_t i = 0; i < trees.size(); i++) {
+        node* root = trees[i];
+        if (!root->is_leaf()) {
+            if (root->threshold < current.lower[root->feature] + 1e-8) { // TODO: epsilon or some shit
+                trees[i] = root->right;
+                solve();
+                trees[i] = root;
+                return;
+            }
+            if (root->threshold > current.upper[root->feature] - 1e-8) {
+                trees[i] = root->left;
+                solve();
+                trees[i] = root;
+                return;
             }
         }
     }
@@ -140,11 +138,13 @@ void solve() {
     current.set(split_root->feature, best_border);
     solve();
 
+    split_count++;
     if (better(possible - best->value + worst->value, ans_value)) {
         trees[max_pos] = worst;
         current.set(split_root->feature, worst_border);
         solve();
-    }
+        bad_count++;
+    } 
 
     trees[max_pos] = split_root;
     current.set(split_root->feature, old_border);
@@ -186,6 +186,8 @@ int main() {
     ans = rect(n_features);
     ans_value = sum;
     solve();
+
+    fprintf(stderr, "Done\nHeuristic effectiveness: %lf%%", (double)(split_count - bad_count) / split_count * 100);
 
     printf("%lf\n", ans_value / forest_size);
     ans.print(stdout);
