@@ -7,8 +7,8 @@ from subprocess import Popen, PIPE
 import numpy as np
 import time
 
-def run_tree(X, y, random_state=None):
-    tree = InvertedTree(random_state=1488)
+def run_tree(X, y, *args, **kwargs):
+    tree = InvertedTree(*args, **kwargs)
     tree.fit(X, y)
     # print(tree.dump())
     min_value, min_rect = tree.inverse('min')
@@ -16,10 +16,8 @@ def run_tree(X, y, random_state=None):
     return min_value, max_value, min_rect, max_rect
 
 
-def prep_forest(X, y, random_state):
-    # forest = InvertedForest(n_estimators=2, random_state=144)
-    # forest = InvertedForest(n_estimators=2)
-    forest = InvertedForest(random_state=random_state)
+def prep_forest(X, y, *args, **kwargs):
+    forest = InvertedForest(*args, **kwargs)
     forest.fit(X, y)
     print("Number of trees: ", len(forest.trees))
     # print("\n\n\n--------------------------------------")
@@ -28,21 +26,23 @@ def prep_forest(X, y, random_state):
     return forest
 
 
-def run_dumb_forest(X, y, random_state=None):
-    forest = prep_forest(X, y, random_state)
+def run_dumb_forest(X, y, *args, **kwargs):
+    forest = prep_forest(X, y, *args, **kwargs)
     min_value, min_rect = forest.intersect_all('min')
     max_value, max_rect = forest.intersect_all('max')
     return min_value, max_value, min_rect, max_rect
 
-def run_slow_forest(X, y, random_state=None):
-    forest = prep_forest(X, y, random_state)
+
+def run_slow_forest(X, y, *args, **kwargs):
+    forest = prep_forest(X, y, *args, **kwargs)
     min_value, min_rect = forest.inverse('min')
     max_value, max_rect = forest.inverse('max')
     return min_value, max_value, min_rect, max_rect
 
-def run_other(X, y, name, random_state=None):
+
+def run_other(X, y, name, *args, **kwargs):
     def call(expr):
-        print("\n--------------------------------------")
+        print("\n---- C++ -----------------------------")
         other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
         start_time = time.time()
         out, err = other.communicate(expr + '\n' + forest.dump())
@@ -65,11 +65,14 @@ def run_other(X, y, name, random_state=None):
         point = [(1000 if np.isinf(x) else x) for x in point]
         X = np.array(point).reshape(-1, forest.n_features_)
         true_value = forest.predict(X)[0]
-        assert abs(value - true_value) < value * 1e-8, "value = " + str(value) + ", true_value = " + str(true_value) + "\npoint = " + np.array2string(X, max_line_width=1000, formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=",")
+        assert abs(value - true_value) < value * 1e-5,\
+                "value = " + str(value) + ", true_value = " + str(true_value) + "\npoint = " + \
+                np.array2string(X, max_line_width=1000,\
+                formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=",")
         return value, rect
 
 
-    forest = prep_forest(X, y, random_state)
+    forest = prep_forest(X, y, *args, **kwargs)
     min_value, min_rect = call('min')
     max_value, max_rect = call('max')
 
@@ -78,20 +81,16 @@ def run_other(X, y, name, random_state=None):
     return min_value, max_value, min_rect, max_rect
 
 
-# dataset = datasets.load_diabetes()
-# dataset = datasets.load_boston()
-# dataset = datasets.load_iris()
+# sets = [
+#         datasets.load_diabetes(),
+#         datasets.load_boston(),
+#         datasets.load_iris()
+#         ]
 
-sets = [
-        datasets.load_diabetes(),
-        datasets.load_boston(),
-        datasets.load_iris()
-        ]
-
-funcs = [
-        run_dumb_forest,
-        run_slow_forest
-        ]
+# funcs = [
+#         run_dumb_forest,
+#         run_slow_forest
+#         ]
 
 # for dataset in sets:
 #     for func in funcs:
@@ -115,15 +114,27 @@ dataset = datasets.load_diabetes()
 X = dataset.data
 y = dataset.target
 
+# for state in range(100):
+#     print (" ---- [", state, "] ----")
+#     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=state)
+
 # min_value, max_value, min_rect, max_rect = run_slow_forest(X, y)
 # min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
-# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state = 11)
-
-for state in range(100):
-    print (" ---- [", state, "] ----")
-    min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=state)
+min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=16, max_depth=40)
 
 print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
 print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
 
-visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 0, 1, dataset.feature_names)
+visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 4, 6, dataset.feature_names)
+
+# times = []
+# for i in range(1, 25):
+#     start_time = time.time()
+#     # min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=i, random_state = 1488)
+#     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=16, max_depth=i, random_state = 1488)
+#     elapsed_time = time.time() - start_time
+#     times.append(elapsed_time);
+
+# import matplotlib.pyplot as plt
+# plt.plot(times, marker="o")
+# plt.show()
