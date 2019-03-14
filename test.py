@@ -2,6 +2,7 @@ from inverted_forest import InvertedForest
 from inverted_tree import InvertedTree, Rect
 from visualisator import Visualiser
 from sklearn import datasets
+from sklearn.preprocessing import LabelEncoder
 from subprocess import Popen, PIPE
 
 import numpy as np
@@ -65,19 +66,19 @@ def run_other(X, y, name, *args, **kwargs):
         point = [(1000 if np.isinf(x) else x) for x in point]
         X = np.array(point).reshape(-1, forest.n_features_)
         true_value = forest.predict(X)[0]
-        assert abs(value - true_value) < value * 1e-5,\
-                "value = " + str(value) + ", true_value = " + str(true_value) + "\npoint = " + \
-                np.array2string(X, max_line_width=1000,\
-                formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=",")
+        # assert abs(value - true_value) < value * 1e-5,\
+        #         "value = " + str(value) + ", true_value = " + str(true_value) + "\npoint = " + \
+        #         np.array2string(X, max_line_width=1000,\
+        #         formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=",")
         return value, rect
 
 
     forest = prep_forest(X, y, *args, **kwargs)
+    f = open("test_forest.txt", "w")
+    f.write('min\n' + forest.dump()) 
+
     min_value, min_rect = call('min')
     max_value, max_rect = call('max')
-
-    # f = open("test_forest.txt", "w")
-    # f.write('min\n' + forest.dump()) 
     return min_value, max_value, min_rect, max_rect
 
 
@@ -131,7 +132,7 @@ visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 4, 6, da
 # for i in range(1, 25):
 #     start_time = time.time()
 #     # min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=i, random_state = 1488)
-#     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=16, max_depth=i, random_state = 1488)
+#     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=20, max_depth=i, random_state = 1488)
 #     elapsed_time = time.time() - start_time
 #     times.append(elapsed_time);
 

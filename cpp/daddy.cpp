@@ -2,7 +2,7 @@
 #include "forest.h"
 
 int main() {
-    /* freopen("test_forest.txt", "r", stdin); */
+    /* freopen("../test_forest.txt", "r", stdin); */
 
     char type[8];
     size_t n_features, forest_size;

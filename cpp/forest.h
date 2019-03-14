@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cassert>
-#include <vector>
+#include <iostream>
 
 #include "util.h"
 
@@ -9,53 +9,58 @@ class forest {
     size_t forest_size;
     size_t n_features;
 
+    vector<node*> roots;
     vector<node*> trees;
+    size_t *leaves;
     comp cmp;
 
     rect current;
     rect ans;
     double ans_value;
     size_t ans_count;
+    size_t before_split_count = 0;
     size_t split_count = 0;
     size_t bad_count = 0;
 
-    size_t all = 0;
-    size_t fast = 0;
+    pair<double, const rect*> leaf(size_t i) {
+        return roots[i]->leaves[leaves[i]];
+    }
 
-    void solve() {
-        all++;
-
-        size_t max_pos = -1;
-        double max_diff = -1;
+    void sync_values() {
         double possible = 0;
+        double est = 0;
         bool all_leafs = true;
+
         for (size_t i = 0; i < trees.size(); i++) {
             node* root = trees[i];
             if (!root->is_leaf()) {
                 // make all intersect current
-                if (root->threshold < current.lower[root->feature] + 1e-8) {  // TODO: epsilon or some shit
+                if (root->threshold < current.lower[root->feature] + 1e-8) { // <= TODO: epsilon or some shit
                     trees[i] = root->right;
-                    solve();
+                    sync_values();
                     trees[i] = root;
-                    fast++;
                     return;
                 }
-                if (root->threshold > current.upper[root->feature] - 1e-8) {
+                if (root->threshold > current.upper[root->feature] - 1e-8) { // >=
                     trees[i] = root->left;
-                    solve();
+                    sync_values();
                     trees[i] = root;
-                    fast++;
                     return;
                 }
 
+                if (!intersects(*leaf(i).second, current)) {
+                    size_t old = leaves[i];
+                    while (!intersects(*leaf(i).second, current)) {
+                        leaves[i]++;
+                    }
+                    sync_values();
+                    leaves[i] = old;
+                    return;
+                } 
                 all_leafs = false;
-                double diff = abs(root->left->value - root->right->value);
-                if (diff > max_diff) {
-                    max_diff = diff;
-                    max_pos = i;
-                }
             }
             possible += root->value;
+            est += leaf(i).first;
         }
 
         if (all_leafs) {
@@ -68,6 +73,28 @@ class forest {
                 ans.copy(current);
             }
             return;
+        }
+
+        before_split_count++;
+        if (cmp(est, ans_value)) {
+            split();
+        }
+    }
+
+    void split() {
+        size_t max_pos = -1;
+        double max_diff = -1;
+        double possible = 0;
+        for (size_t i = 0; i < trees.size(); i++) {
+            node* root = trees[i];
+            possible += root->value;
+            if (!root->is_leaf()) {
+                double diff = abs(root->left->value - root->right->value);
+                if (diff > max_diff) {
+                    max_diff = diff;
+                    max_pos = i;
+                }
+            }
         }
 
         node* split_root = trees[max_pos];
@@ -84,13 +111,13 @@ class forest {
 
         trees[max_pos] = best;
         current.set(split_root->feature, best_border);
-        solve();
+        sync_values();
 
         split_count++;
         if (cmp(possible - best->value + worst->value, ans_value)) {
             trees[max_pos] = worst;
             current.set(split_root->feature, worst_border);
-            solve();
+            sync_values();
             bad_count++;
         }
 
@@ -101,6 +128,7 @@ class forest {
 public:
     forest(size_t forest_size, size_t n_features, char* type)
         : forest_size(forest_size), n_features(n_features), cmp(type) {
+            leaves = new size_t[forest_size];
     }
 
     void read_nodes(FILE* stream) {
@@ -113,10 +141,10 @@ public:
                 int index, feature, left_index, right_index;
                 double threshold, value;
                 fscanf(stream, "%d %d %lf %lf %d %d", &index, &feature, &threshold, &value, &left_index, &right_index);
-                nodes[index] = new node(index, feature, threshold, value, left_index, right_index);
+                nodes[index] = new node(index, feature, threshold, value, left_index, right_index, n_features);
             }
             for (int j = 0; j < size; j++) {
-                if (nodes[j]->left_index != -1) {
+                if (nodes[j]->left_index != (size_t)-1) {
                     nodes[j]->left = nodes[nodes[j]->left_index];
                     nodes[j]->right = nodes[nodes[j]->right_index];
                 }
@@ -124,6 +152,7 @@ public:
             nodes[0]->precalc(cmp);
             trees.push_back(nodes[0]);
         }
+        roots = vector<node*>(trees);
     }
 
     pair<double, rect> inverse() {
@@ -142,12 +171,13 @@ public:
         current = rect(n_features);
         ans = rect(n_features);
         ans_value = sum;
-        solve();
+        sync_values();
 
         fprintf(stderr, "Done\nHeuristic effectiveness: %.0lf%% (%zu / %zu)\n",
                 (double)(split_count - bad_count) / split_count * 100, split_count - bad_count, split_count);
-        fprintf(stderr, "Number of nodes = %zu, skipped = %.0lf%% (%zu / %zu}", 
-                size, (double)fast / all * 100, fast, all);
+        fprintf(stderr, "Optimization effectiveness: %.0lf%% (%zu / %zu)\n",
+                (double)(split_count) / before_split_count * 100, split_count, before_split_count);
+
         /* fprintf(stderr, "Number of zones: %zu\n", ans_count);; */
         /* assert(ans_count == 1); */
 

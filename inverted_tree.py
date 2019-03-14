@@ -20,6 +20,9 @@ class Rect:
     def is_empty(self):
         return any(bound[0] > bound[1] for bound in self.bounds)
 
+    def apply(self, func):
+        func(self.bounds.ravel())
+
     def __init__(self, lower, upper):
         self.bounds = np.array([lower, upper]).transpose()
 
