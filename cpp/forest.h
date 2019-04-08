@@ -21,8 +21,9 @@ class forest {
     size_t before_split_count = 0;
     size_t split_count = 0;
     size_t bad_count = 0;
+    size_t sync_count = 0;
 
-    pair<double, const rect*> leaf(size_t i) {
+    inline pair<double, const rect*> leaf(size_t i) const {
         return roots[i]->leaves[leaves[i]];
     }
 
@@ -30,6 +31,7 @@ class forest {
         double possible = 0;
         double est = 0;
         bool all_leafs = true;
+        sync_count++;
 
         for (size_t i = 0; i < trees.size(); i++) {
             node* root = trees[i];
@@ -61,6 +63,7 @@ class forest {
             }
             possible += root->value;
             est += leaf(i).first;
+            /* est = possible; */
         }
 
         if (all_leafs) {
@@ -71,6 +74,7 @@ class forest {
                 ans_value = possible;
                 ans_count = 1;
                 ans.copy(current);
+                cerr << ans_value << "\t" << sync_count << endl;
             }
             return;
         }
@@ -104,7 +108,7 @@ class forest {
         auto best_border = make_pair(old_border.first, split_root->threshold);
         auto worst_border = make_pair(split_root->threshold, old_border.second);
 
-        if (cmp(split_root->left->value, split_root->right->value)) {
+        if (!cmp(split_root->left->value, split_root->right->value)) {
             swap(best, worst);
             swap(best_border, worst_border);
         }

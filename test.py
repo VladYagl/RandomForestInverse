@@ -20,7 +20,7 @@ def run_tree(X, y, *args, **kwargs):
 def prep_forest(X, y, *args, **kwargs):
     forest = InvertedForest(*args, **kwargs)
     forest.fit(X, y)
-    print("Number of trees: ", len(forest.trees))
+    print("Forest fitted, number of trees: ", len(forest.trees))
     # print("\n\n\n--------------------------------------")
     # print(forest.dump())
     # print("--------------------------------------\n\n\n")
@@ -44,7 +44,9 @@ def run_slow_forest(X, y, *args, **kwargs):
 def run_other(X, y, name, *args, **kwargs):
     def call(expr):
         print("\n---- C++ -----------------------------")
-        other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
+        log = open("log_" + str(time.time()) + ".txt", "w")
+        other = Popen(name, stdin=PIPE, stdout=PIPE, stderr=log, encoding='utf8')
+        # other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
         start_time = time.time()
         out, err = other.communicate(expr + '\n' + forest.dump())
         elapsed_time = time.time() - start_time
@@ -76,44 +78,42 @@ def run_other(X, y, name, *args, **kwargs):
     forest = prep_forest(X, y, *args, **kwargs)
     f = open("test_forest.txt", "w")
     f.write('min\n' + forest.dump()) 
+    print('forest saved to "test_forest.txt"')
 
     min_value, min_rect = call('min')
     max_value, max_rect = call('max')
     return min_value, max_value, min_rect, max_rect
 
 
-# sets = [
-#         datasets.load_diabetes(),
-#         datasets.load_boston(),
-#         datasets.load_iris()
-#         ]
-
-# funcs = [
-#         run_dumb_forest,
-#         run_slow_forest
-#         ]
-
-# for dataset in sets:
-#     for func in funcs:
-#         print("     ==next==\n")
-#         for state in range(5):
-#             print("--->", func)
-#             X = dataset.data
-#             y = dataset.target
-
-#             min_value, max_value, min_rect, max_rect = func(X, y, state)
-
-#             print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
-#             print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
-#             print()
-
-
 print("\n\n")
-dataset = datasets.load_diabetes()
-# dataset = datasets.load_boston()
-# dataset = datasets.load_iris()
+# datafile = "house_16H.csv"
+# datafile = "house_8L.csv"
+# target = "price"
+
+# datafile = "strikes.csv"
+# target = "strike_volume"
+
+# input_set = pandas.read_csv(datafile, index_col = 0)
+# X = input_set.values[:, input_set.columns != target]
+# y = input_set.values[:, input_set.columns == target]
+# feature_names = input_set.columns.values.tolist()
+
+# dataset = datasets.fetch_openml(name="autoPrice")         # 159 instances - 16 features
+# dataset = datasets.fetch_openml(name="wisconsin")         # 194 instances - 33 features
+# dataset = datasets.fetch_openml(name="strikes")           # 625 instances - 7 features
+dataset = datasets.fetch_openml(name="kin8nm")            # 8192 instances - 9 features
+# dataset = datasets.fetch_openml(name="house_8L")          # 22784 instances - 9 features 
+# dataset = datasets.fetch_openml(name="house_16H")         # 22784 instances - 9 features 
+# dataset = datasets.fetch_openml(name="mtp2")              # 274 instances - 1143 features
+# dataset = datasets.fetch_openml(name="QSAR-TID-11617")    # 309 instances - 1026 features
+
+# dataset = datasets.load_diabetes()                        # 442 instances - 9 features
+# dataset = datasets.load_boston()                          # 506 instances - 12 features
+
 X = dataset.data
 y = dataset.target
+feature_names = dataset.feature_names
+print("Dataset loaded")
 
 # for state in range(100):
 #     print (" ---- [", state, "] ----")
@@ -121,15 +121,16 @@ y = dataset.target
 
 # min_value, max_value, min_rect, max_rect = run_slow_forest(X, y)
 # min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
-min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=16, max_depth=40)
+min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=20)
+# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/dummy", random_state=1488, n_estimators=20)
 
 print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
 print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
 
-visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 4, 6, dataset.feature_names)
+visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 1, 2, feature_names)
 
 # times = []
-# for i in range(1, 25):
+# for i in range(1, 50):
 #     start_time = time.time()
 #     # min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=i, random_state = 1488)
 #     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=20, max_depth=i, random_state = 1488)

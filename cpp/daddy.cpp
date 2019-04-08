@@ -13,6 +13,7 @@ int main() {
 
     forest gump(forest_size, n_features, type);
     gump.read_nodes(stdin);
+    cerr << "forest reading completed!" << endl;
     auto result = gump.inverse();
     double ans_value = result.first;
     rect ans = result.second;
