@@ -11,7 +11,7 @@ class forest {
 
     vector<node*> roots;
     vector<node*> trees;
-    size_t *leaves;
+    vector<size_t> leaves;
     comp cmp;
 
     rect current;
@@ -30,43 +30,45 @@ class forest {
     void sync_values() {
         double possible = 0;
         double est = 0;
-        bool all_leafs = true;
+        bool all_leaves = true;
         sync_count++;
+        auto old_leaves = leaves;
+        auto old_trees = trees;
 
+        // make all intersect current
+        for (size_t i = 0; i < trees.size(); i++) {
+            // v TODO: epsilon or some shit
+            while (!trees[i]->is_leaf() && trees[i]->threshold < current.lower[trees[i]->feature] + 1e-8) {
+                trees[i] = trees[i]->right;
+            }
+            while (!trees[i]->is_leaf() && trees[i]->threshold > current.upper[trees[i]->feature] - 1e-8) {  // >=
+                trees[i] = trees[i]->left;
+            }
+        }
+
+        // update possible leaves
         for (size_t i = 0; i < trees.size(); i++) {
             node* root = trees[i];
             if (!root->is_leaf()) {
-                // make all intersect current
-                if (root->threshold < current.lower[root->feature] + 1e-8) { // <= TODO: epsilon or some shit
-                    trees[i] = root->right;
-                    sync_values();
-                    trees[i] = root;
-                    return;
-                }
-                if (root->threshold > current.upper[root->feature] - 1e-8) { // >=
-                    trees[i] = root->left;
-                    sync_values();
-                    trees[i] = root;
-                    return;
-                }
-
                 if (!intersects(*leaf(i).second, current)) {
-                    size_t old = leaves[i];
                     while (!intersects(*leaf(i).second, current)) {
                         leaves[i]++;
+                        if (leaves[i] >= roots[i]->leaves.size()) {
+                            leaves = std::move(old_leaves);
+                            trees = std::move(old_trees);
+                            return;
+                        }
                     }
-                    sync_values();
-                    leaves[i] = old;
-                    return;
-                } 
-                all_leafs = false;
+                }
+                all_leaves = false;
             }
             possible += root->value;
             est += leaf(i).first;
             /* est = possible; */
         }
 
-        if (all_leafs) {
+        // update ans if all leafs
+        if (all_leaves) {
             if (possible == ans_value) {
                 ans_count++;
             }
@@ -76,6 +78,8 @@ class forest {
                 ans.copy(current);
                 cerr << ans_value << "\t" << sync_count << endl;
             }
+            leaves = std::move(old_leaves);
+            trees = std::move(old_trees);
             return;
         }
 
@@ -83,6 +87,9 @@ class forest {
         if (cmp(est, ans_value)) {
             split();
         }
+
+        leaves = std::move(old_leaves);
+        trees = std::move(old_trees);
     }
 
     void split() {
@@ -131,8 +138,7 @@ class forest {
 
 public:
     forest(size_t forest_size, size_t n_features, char* type)
-        : forest_size(forest_size), n_features(n_features), cmp(type) {
-            leaves = new size_t[forest_size];
+        : forest_size(forest_size), n_features(n_features), leaves(forest_size), cmp(type) {
     }
 
     void read_nodes(FILE* stream) {

@@ -45,8 +45,8 @@ def run_other(X, y, name, *args, **kwargs):
     def call(expr):
         print("\n---- C++ -----------------------------")
         log = open("log_" + str(time.time()) + ".txt", "w")
-        other = Popen(name, stdin=PIPE, stdout=PIPE, stderr=log, encoding='utf8')
-        # other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
+        # other = Popen(name, stdin=PIPE, stdout=PIPE, stderr=log, encoding='utf8')
+        other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
         start_time = time.time()
         out, err = other.communicate(expr + '\n' + forest.dump())
         elapsed_time = time.time() - start_time
@@ -98,17 +98,17 @@ print("\n\n")
 # y = input_set.values[:, input_set.columns == target]
 # feature_names = input_set.columns.values.tolist()
 
-# dataset = datasets.fetch_openml(name="autoPrice")         # 159 instances - 16 features
-# dataset = datasets.fetch_openml(name="wisconsin")         # 194 instances - 33 features
-# dataset = datasets.fetch_openml(name="strikes")           # 625 instances - 7 features
-dataset = datasets.fetch_openml(name="kin8nm")            # 8192 instances - 9 features
-# dataset = datasets.fetch_openml(name="house_8L")          # 22784 instances - 9 features 
-# dataset = datasets.fetch_openml(name="house_16H")         # 22784 instances - 9 features 
-# dataset = datasets.fetch_openml(name="mtp2")              # 274 instances - 1143 features
-# dataset = datasets.fetch_openml(name="QSAR-TID-11617")    # 309 instances - 1026 features
+# dataset = datasets.fetch_openml(name="autoPrice")         # 159 instances - 16 features   || 30 - 0.01sec || 100 - 6sec
+# dataset = datasets.fetch_openml(name="wisconsin")         # 194 instances - 33 features   || 30 - 17sec
+# dataset = datasets.fetch_openml(name="strikes")           # 625 instances - 7 features    || 30 - 0.36 || 100 - 1.5 sec
+# dataset = datasets.fetch_openml(name="kin8nm")            # 8192 instances - 9 features   || 30 - 54sec
+# dataset = datasets.fetch_openml(name="house_8L")          # 22784 instances - 9 features  || 30 - 20sec
+# dataset = datasets.fetch_openml(name="house_16H")         # 22784 instances - 9 features  || 20 - 174sec
+# dataset = datasets.fetch_openml(name="mtp2")              # 274 instances - 1143 features || 30 - 0.30sec || 60 - 1.0sec
+# dataset = datasets.fetch_openml(name="QSAR-TID-11617")    # 309 instances - 1026 features ||
 
-# dataset = datasets.load_diabetes()                        # 442 instances - 9 features
-# dataset = datasets.load_boston()                          # 506 instances - 12 features
+# dataset = datasets.load_diabetes()                        # 442 instances - 9 features    || 30 - 1.07sec || 50 - 20sec
+# dataset = datasets.load_boston()                          # 506 instances - 12 features   || 30 - 0.27sec || 100 - 1sec
 
 X = dataset.data
 y = dataset.target
@@ -121,8 +121,8 @@ print("Dataset loaded")
 
 # min_value, max_value, min_rect, max_rect = run_slow_forest(X, y)
 # min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
-min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=20)
-# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/dummy", random_state=1488, n_estimators=20)
+min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=100)
+# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/dummy", random_state=1488, n_estimators=30)
 
 print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
 print("Maximum rect:", "OK" if not max_rect.is_empty() else "FAIL", "value:", max_value)
