@@ -61,9 +61,14 @@ bool intersects(const rect &ths, const rect &rhs) {
 typedef pair<double, const rect*> leaf;
 struct comp {
     bool is_min = false;
+    double error;
 
-    comp(char *type) {
+    comp(char *type, double error = 0.00): error(error) {
         is_min = strcmp(type, "min") == 0;
+    }
+
+    double inc(double value) {
+        return value + (is_min ? -1 : +1) * abs(value * error);
     }
 
     bool operator()(double a, double b) const {
@@ -92,58 +97,5 @@ struct comp {
             return b;
         else
             return a;
-    }
-};
-
-struct node {
-    size_t index, size, depth;
-    size_t feature;
-    node *left, *right;
-    double threshold, value, shit;
-    size_t left_index, right_index;
-    size_t n_features;
-    vector<leaf> leaves;
-    rect area;
-
-    node(size_t index, size_t feature, double threshold, double value, size_t left_index, size_t right_index, size_t n_features)
-        : index(index),
-          feature(feature),
-          threshold(threshold),
-          value(value),
-          shit(value),
-          left_index(left_index),
-          right_index(right_index),
-          n_features(n_features),
-          area(n_features) {
-        left = nullptr;
-        right = nullptr;
-        size = 1;
-        depth = 1;
-    }
-
-    void precalc(const comp &cmp) {
-        if (is_leaf()) {
-            leaves.emplace_back(value, &area);
-            return;
-        }
-
-        left->area.copy(area);
-        left->area.upper[feature] = min(left->area.upper[feature], threshold);
-        right->area.copy(area);
-        right->area.lower[feature] = max(right->area.lower[feature], threshold);
-        left->precalc(cmp);
-        right->precalc(cmp);
-
-        leaves.reserve(left->leaves.size() + right->leaves.size());
-        merge(left->leaves.begin(), left->leaves.end(), right->leaves.begin(), right->leaves.end(), back_inserter(leaves), cmp);
-
-        value = cmp.best(left->value, right->value);
-        shit = cmp.worst(left->shit, right->shit);
-        size = left->size + right->size;
-        depth = max(left->depth, right->depth) + 1;
-    }
-
-    bool is_leaf() const {
-        return left == nullptr;
     }
 };
