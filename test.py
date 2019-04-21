@@ -9,6 +9,9 @@ import numpy as np
 import time
 import statistics
 import sys
+import os
+
+os.mkdir("log/")
 
 def run_tree(X, y, *args, **kwargs):
     tree = InvertedTree(*args, **kwargs)
