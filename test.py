@@ -7,6 +7,8 @@ from subprocess import Popen, PIPE
 
 import numpy as np
 import time
+import statistics
+import sys
 
 def run_tree(X, y, *args, **kwargs):
     tree = InvertedTree(*args, **kwargs)
@@ -101,19 +103,9 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
     return min_value, max_value, min_rect, max_rect, time_min + time_max
 
 
-print("\n\n")
-# datafile = "house_16H.csv"
-# datafile = "house_8L.csv"
-# takget = "price"
+# -----------------SINGLE TESTING-------------------------------------------------------------------------------------------------
 
-# datafile = "strikes.csv"
-# target = "strike_volume"
-
-# input_set = pandas.read_csv(datafile, index_col = 0)
-# X = input_set.values[:, input_set.columns != target]
-# y = input_set.values[:, input_set.columns == target]
-# feature_names = input_set.columns.values.tolist()
-
+# print("\n\n")
 # dataset = datasets.fetch_openml(name="autoPrice")         # 159 instances - 16 features   || 30 - 0.01sec || 100 - 6sec
 # dataset = datasets.fetch_openml(name="wisconsin")         # 194 instances - 33 features   || 30 - 17sec
 # dataset = datasets.fetch_openml(name="strikes")           # 625 instances - 7 features    || 30 - 0.36 || 100 - 1.5 sec
@@ -123,12 +115,12 @@ print("\n\n")
 # dataset = datasets.fetch_openml(name="mtp2")              # 274 instances - 1143 features || 30 - 0.30sec || 60 - 1.0sec
 # dataset = datasets.fetch_openml(name="QSAR-TID-11617")    # 309 instances - 1026 features ||
 
-dataset = datasets.load_diabetes()              # 442 instances - 9 features    || 30 - 1.07sec || 50 - 20sec || 50+5% - 5sec
+# dataset = datasets.load_diabetes()              # 442 instances - 9 features    || 30 - 1.07sec || 50 - 20sec || 50+5% - 5sec
 # dataset = datasets.load_boston()                # 506 instances - 12 features   || 30 - 0.27sec || 100 - 1sec
 
-X = dataset.data
-y = dataset.target
-feature_names = dataset.feature_names
+# X = dataset.data
+# y = dataset.target
+# feature_names = dataset.feature_names
 # print("Dataset loaded")
 
 # for state in range(100):
@@ -148,30 +140,16 @@ feature_names = dataset.feature_names
 
 # visualiser = Visualiser(X, y, min_value, max_value, min_rect, max_rect, 1, 2, feature_names)
 
-# --------------------------------------------------------------------------------------------------------------------------------
-
-# times = []
-# for i in range(1, 50):
-#     start_time = time.time()
-#     # min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=i, random_state = 1488)
-#     min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", n_estimators=20, max_depth=i, random_state = 1488)
-#     elapsed_time = time.time() - start_time
-#     times.append(elapsed_time);
-
-# import matplotlib.pyplot as plt
-# plt.plot(times, marker="o")
-# plt.show()
-
-# --------------------------------------------------------------------------------------------------------------------------------
+# -----------------MASS TESTING---------------------------------------------------------------------------------------------------
 
 algos = [
-        # ("basic", 0.0, 0), 
-        # ("basic", 0.05, 0), 
-        # ("random", 0.0, 1000000), 
-        # ("gena", 0.0, 1000), 
-        # ("heuristic", 0.0, 0), 
-        # ("heuristic", 0.05, 0)
-        ("heuristic", 0.15, 0)
+        ("basic", 0.0, 0), 
+        ("basic", 0.05, 0), 
+        ("random", 0.0, 1000000), 
+        ("gena", 0.0, 1000), 
+        ("heuristic", 0.0, 0), 
+        ("heuristic", 0.05, 0),
+        ("heuristic", 0.15, 0),
         ]
 
 datasets = [
@@ -194,6 +172,8 @@ datasets = [
         (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
         ]
 
+n_tests = 10;
+
 for dataset in datasets:
     print(dataset[3], dataset[1], dataset[2])
     X = dataset[0].data
@@ -202,10 +182,21 @@ for dataset in datasets:
         name = algo[0]
         error = algo[1]
         iters = algo[2]
+
         try: 
-            min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=1488, 
-                    n_estimators=dataset[1], max_depth=dataset[2],
-                    algo=name, error = error, iterations=iters, output=False, timeout=240)
-            print(algo, ", ",  min_value, ", ", max_value, ", ", algo_time)
+            times = []
+            min_sum = 0
+            max_sum = 0
+            for random_state in range(n_tests):
+                sys.stdout.write("\r " + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|")
+                min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=random_state, 
+                        n_estimators=dataset[1], max_depth=dataset[2],
+                        algo=name, error = error, iterations=iters, output=False, timeout=240)
+                times.append(algo_time)
+                min_sum += min_value
+                max_sum += max_value
+            mean_time = statistics.mean(times)
+            sd_time = statistics.stdev(times)
+            print("\r", algo, ", ",  min_sum, ", ", max_sum, ", ", mean_time, ", ", sd_time)
         except Exception as e:
             print(algo, e)
