@@ -45,8 +45,8 @@ class gena : public forest {
         }
         for (auto& a : space) {
             sort(a.begin(), a.end());
-            for (size_t i = 0; i < a.size() - 1; i++) {  // TODO: !!! O(n^2) !!!
-                while (i < a.size() - 1 && a[i + 1].split - a[i].split < 1e-4 * abs(a[i].split) + 1e-8) { // TODO : epsilon
+            for (int i = 0; i < (int)a.size() - 1; i++) {  // TODO: !!! O(n^2) !!!
+                while (i < (int)a.size() - 1 && a[i + 1].split - a[i].split < 1e-4 * abs(a[i].split) + 1e-8) { // TODO : epsilon
                     a[i].trees.insert(*a[i + 1].trees.begin());
                     a.erase(a.begin() + i + 1);
                 }
@@ -66,6 +66,10 @@ class gena : public forest {
     }
 
     void set(size_t feature, size_t pos) {
+        if (space[feature].size() == 0) {
+            location[feature] = 0.0;
+            return;
+        }
         if (pos == 0) {
             location[feature] = space[feature].front().split - 1;
         } else if (pos == space[feature].size()) {
@@ -90,7 +94,7 @@ public:
 
         divide_space();
 
-        for (size_t kappa = 0; kappa < 100000; kappa++) {
+        for (size_t kappa = 0; kappa < 1000; kappa++) {
             for (size_t i = 0; i < n_features; i++) {
                 pos[i] = rand() % (space[i].size() + 1);
                 set(i, pos[i]);
@@ -105,7 +109,12 @@ public:
             cmp.error = 1e-8;
 
             for (size_t shit = 0; shit < iterations; shit++) {
-                size_t feature = rand() % n_features;
+                size_t feature;
+                while (true) {
+                    feature = rand() % n_features;
+                    if (space[feature].size() > 0) break;
+                }
+
                 int move;
                 if (pos[feature] == space[feature].size()) {
                     move = -1;
