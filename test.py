@@ -11,7 +11,10 @@ import statistics
 import sys
 import os
 
-os.mkdir("log/")
+try: 
+    os.mkdir("log/")
+except:
+    pass
 
 def run_tree(X, y, *args, **kwargs):
     tree = InvertedTree(*args, **kwargs)
