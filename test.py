@@ -149,42 +149,42 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
 # -----------------MASS TESTING---------------------------------------------------------------------------------------------------
 
 algos = [
-        ("basic", 0.0, 0), 
-        ("basic", 0.05, 0), 
-        ("random", 0.0, 1000000), 
-        ("gena", 0.0, 1000), 
+        # ("basic", 0.0, 0), 
+        # ("basic", 0.05, 0), 
+        # ("random", 0.0, 1000000), 
+        # ("gena", 0.0, 1000), 
         ("heuristic", 0.0, 0), 
-        ("heuristic", 0.05, 0),
-        ("heuristic", 0.15, 0),
+        # ("heuristic", 0.05, 0),
+        # ("heuristic", 0.15, 0),
         ]
 
 datasets = [
-        (datasets.load_diabetes(), 20, None, "diabetes"),
-        (datasets.load_diabetes(), 50, None, "diabetes"),
-        (datasets.load_boston(), 30, None, "boston"),
-        (datasets.load_boston(), 100, None, "boston"),
-        (datasets.fetch_openml(name="autoPrice"), 30, None, "autoPrice"),
-        (datasets.fetch_openml(name="wisconsin"), 30, None, "wisconsin"),
-        (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
-        (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
-        (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
-        (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
-        (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
-        (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
-        (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
-        (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
+        # (datasets.load_diabetes(), 20, None, "diabetes"),
+        # (datasets.load_diabetes(), 50, None, "diabetes"),
+        # (datasets.load_boston(), 30, None, "boston"),
+        # (datasets.load_boston(), 100, None, "boston"),
+        # (datasets.fetch_openml(name="autoPrice"), 30, None, "autoPrice"),
+        # (datasets.fetch_openml(name="wisconsin"), 30, None, "wisconsin"),
+        # (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
+        # (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
+        # (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
+        # (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
+        # (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
+        # (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
+        # (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
+        # (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
         (datasets.fetch_openml(name="mtp2"), 60, None, "mtp2"),
-        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
-        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
+        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
+        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
         ]
 
 n_tests = 10;
 
-for dataset in datasets:
+for i, dataset in enumerate(datasets):
     print(dataset[3], dataset[1], dataset[2])
     X = dataset[0].data
     y = dataset[0].target
-    for algo in algos:
+    for j, algo in enumerate(algos):
         name = algo[0]
         error = algo[1]
         iters = algo[2]
@@ -194,15 +194,18 @@ for dataset in datasets:
             min_sum = 0
             max_sum = 0
             for random_state in range(n_tests):
-                sys.stdout.write("\r " + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|")
+                sys.stderr.write("\r" + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|" +
+                        " Dataset: " + str(i) + "/" + str(len(datasets)) + " Algo: " + str(j) + "/" + str(len(algos)))
                 min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=random_state, 
                         n_estimators=dataset[1], max_depth=dataset[2],
-                        algo=name, error = error, iterations=iters, output=False, timeout=240)
+                        # algo=name, error = error, iterations=iters, output=False, timeout=240)
+                        algo=name, error = error, iterations=iters, output=False, timeout=600)
                 times.append(algo_time)
                 min_sum += min_value
                 max_sum += max_value
             mean_time = statistics.mean(times)
             sd_time = statistics.stdev(times)
-            print("\r", algo, ", ",  min_sum, ", ", max_sum, ", ", mean_time, ", ", sd_time)
+            sys.stderr.write("\r")
+            print(algo, ", ",  min_sum, ", ", max_sum, ", ", mean_time, ", ", sd_time)
         except Exception as e:
             print(algo, e)

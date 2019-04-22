@@ -4,11 +4,16 @@
 %--------------------------------------
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[russian]{babel}
+\usepackage[english,main=russian]{babel}
 %--------------------------------------
 
-\usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+
+\graphicspath{{logo/}{pics/}}
+\beamertemplatenavigationsymbolsempty{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{footline}{size={\fontsize{10}{12}}}
 
 \title{Оптимизация функции, задаваемой регрессионным лесом}
 \author{Влад Ягламунов}
@@ -16,64 +21,126 @@
 
 \begin{document}
 
+\begin{frame}
 \maketitle
+{\small 
+    \textbf{Формальный научный руководитель:}\par Фильченков Андрей Александрович\par
+    \textbf{Фактический научный руководитель:}\par Шаламов Вячеслав Владимирович
+}
+\end{frame}
 
 \begin{frame}
     \frametitle{Задача}
     \begin{itemize}
-            \item Дано: Обученный регрессионный лес
-            \item Найти: Области, где лес возвращает минимальное и максимальное значение
+        \item \textbf{Дано:} Обученный регрессионный лес
+        \item \textbf{Найти:} Области, где лес возвращает минимальное и максимальное значение
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Последовательная оптимизация основанная на модели Sequential Model-Based Optimization (SMBO)}
+    \frametitle{Применение}
+    Random Forest:
     \begin{itemize}
-            \item Получаем значения в различных точках 
-            \item По ним строиться регрессионная модель
-            \item Модель позволяет предсказать минимум оптимизируемой функции
-            \item В точках минимума запрашиваем значения
+            \item Суррогатные функции для оптимизации
+            \item Хорошо обновляется при добавлении информации \pause{}
+            \item Последовательная оптимизация основанная на модели Sequential Model-Based Optimization (SMBO)
+            \item Sequential Model-based Algorithm configuration (SMAC)
     \end{itemize}
     \vfill
-    Sequential Model-based Algorithm configuration (SMAC)
+    \pause{}
+    Сейчас используется перебор случайного набора точек.
+    \vfill
 \end{frame}
 
 \begin{frame}
-\frametitle{Эвристический алгоритм}
-\begin{columns}
-    \column{.5\textwidth}
-    \includegraphics[width=\textwidth]{split.png}
-    \column{.5\textwidth}
-    \includegraphics[width=\textwidth]{tree.png}
-\end{columns}
+    \frametitle{Random Forest}
+    \begin{columns}
+        \column{.6\textwidth}
+            \begin{itemize}
+                    \item Ансамбль деревьев принятия решения
+                    \item Каждое дерево обучено на случном подмножестве
+                    \item Результат: среднее всех деревьев 
+                    \item Пространство разбивается на прямоугольники по ''трешхолдам'' вершин
+            \end{itemize}
+        \column{.4\textwidth}
+        \includegraphics[width=\textwidth]{random_forest.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Эвристический алгоритм}
+    \begin{columns}
+        \column{.5\textwidth}
+            \begin{itemize}
+                    \item Перебор по всем поддеревьям
+                    \item Для вершины храним минимум и максимум в поддереве
+                    \item Поддерживаем, что все поддеревья пересекаются
+            \end{itemize}
+        \column{.5\textwidth}
+            \includegraphics[width=\textwidth]{tree.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Эвристический алгоритм}
+
+    \begin{columns}
+        \column{.75\textwidth}
+            На каждом шаге рассматриваем n-мерный прямоугольник области
+
+            Шаг: разбиение по трешхолду вершины
+        \column{.25\textwidth}
+            \includegraphics[width=\textwidth]{split.png}
+    \end{columns}
     \vfill
-    \[
-        value[v] = \max(value[v.left], value[v.right])
-    \]Эвристика: 
+    \pause{}
+    Эвристика:
     \[
         i = \arg \max_{v \in trees}(|value[v.left] - value[v.right]|)
     \]
 \end{frame}
 
 \begin{frame}
-    \frametitle{Эвристический алгоритм (Оптимизация)}
-    \begin{center}
-    \includegraphics[height=0.8\textheight]{merge.png}
-    \end{center}
+    \frametitle{Эвристический алгоритм (Оптимизация 1)}
+    Необязательно искать точное решение.
+
+    \vspace{50px}
+    Не будем перебирать поддерево, если в лучшем случае это не улучшит ответ хотя бы на \alpha{}
+
+    \[
+        value[v] < \alpha current
+    \]
+
+    Гарантирует точность \(>\alpha\)
 \end{frame}
 
 \begin{frame}
-\frametitle{Алгоритм имитации оджига}
+    \frametitle{Эвристический алгоритм (Оптимизация 2)}
+    Максимум в поддереве может не пересекаться с текущей областью
+             
+    \begin{columns}
+        \column{.5\textwidth}
+            \begin{itemize}
+                \item Отсортированный список всех его листьев
+                \item На каждом шаге в таком списке мы движемся только вперёд
+            \end{itemize}
+        \column{.5\textwidth}
+            \includegraphics[width=1.1\textwidth]{merge.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Алгоритм имитации отжига}
     \begin{center}
     \includegraphics[width=\textwidth]{gena.png}
     \end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{Алгоритм имитации оджига}
+\frametitle{Алгоритм имитации отжига}
 \begin{columns}
     \column{.5\textwidth}
-    Если значение ухудшилось, то переходим с вероятностью 
+    Если значение ухудшилось, то переходим с вероятностью
     \[
     p=\alpha + (1 - \alpha) \frac{i}{N}
     \]
@@ -89,8 +156,8 @@
     \begin{itemize}
             \item Перебор
             \item Перебор с погрешностью $<5\%$
-            \item Рандом
-            \item ''Оджиг''
+            \item Случайный
+            \item Отжиг
             \item Эвристика
             \item Эвристика с погрешностью $<5\%$
             \item Эвристика с погрешностью $<15\%$
@@ -99,11 +166,13 @@
 
 \begin{frame}
     \frametitle{Использованные данные}
+    Использованные различные общедоступные датасеты с openml
+    \vfill
     \begin{center}
         \begin{tabular}{|l|l|l|}
 
         \hline
-         
+
         название        & элементы  & признаки \\
 
         \hline
@@ -124,30 +193,6 @@
     \end{center}
 \end{frame}
 
-% \begin{frame}
-% \frametitle{Тестирование}
-% \hspace*{-0.8cm}
-%     \begin{tabular}{l l l l l l l}
-
-%         название        & элементы  & признаки & N & время & N & время \\
-
-%         \toprule
-
-%         diabetes        & 442    & 9     & 30 & 1.07  & 50       & 20\\
-%                         &        &       & 30+5\% & 0.24  & 50+5\%      & 5\\
-%         boston          & 506    & 12    & 30 & 0.27  & 100      & 1\\
-%         autoPrice       & 159    & 16    & 30 & 0.01  & 100      & 6\\
-%         wisconsin       & 194    & 33    & 30 & 17    & 30+5\%   & 55\\
-%         strikes         & 625    & 7     & 30 & 0.3   & 100      & 1.5\\
-%         kin8nm          & 8192   & 9     & 30 & 176   & 30+5\%   & 77\\
-%         house\_8L       & 22784  & 9     & 30 & 30    & 30+5\%   & 29\\
-%         house\_16H      & 22784  & 9     & 20 & 112   & 20+5\%   & 55\\
-%         mtp2            & 274    & 1143  & 30 & 0.30  & 60       & 1.0\\
-
-%     \end{tabular}
-% \hspace*{-0.8cm}
-% \end{frame}
-
 \begin{frame}
     \frametitle{Тестирование (Время работы)}
     \begin{center}
@@ -164,17 +209,12 @@
 
 \begin{frame}
     \frametitle{Тестирование (Ошибка)}
-    \[
-        error = \frac{min - min_{true} + max_{true} - max}{max_{true} - min_{true}}
-    \]
+    % \[
+        % error = \frac{min - min_{true} + max_{true} - max}{max_{true} - min_{true}}
+    % \]
     \begin{center}
     \includegraphics[width=\textwidth]{graph_error.png}
     \end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Визуализация}
-    \includegraphics[width=\textwidth]{visual.png}
 \end{frame}
 
 \end{document}
