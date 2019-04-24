@@ -105,19 +105,19 @@
     Необязательно искать точное решение.
 
     \vspace{50px}
-    Не будем перебирать поддерево, если в лучшем случае это не улучшит ответ хотя бы на \alpha{}
+    Не будем перебирать поддерево, если в лучшем случае это не улучшит ответ хотя бы на $\alpha$
 
     \[
         value[v] < \alpha current
     \]
 
-    Гарантирует точность \(>\alpha\)
+    Гарантирует точность $>\alpha$
 \end{frame}
 
 \begin{frame}
     \frametitle{Эвристический алгоритм (Оптимизация 2)}
     Максимум в поддереве может не пересекаться с текущей областью
-             
+
     \begin{columns}
         \column{.5\textwidth}
             \begin{itemize}
@@ -132,15 +132,20 @@
 \begin{frame}
 \frametitle{Алгоритм имитации отжига}
     \begin{center}
-    \includegraphics[width=\textwidth]{gena.png}
+    \includegraphics[width=0.8\textwidth]{gena.png}
     \end{center}
+    \begin{itemize}
+        \item Разбиваем пространство по всем трешхолдам
+        \item Случайные мутации по переходе в соседнюю клетку
+        \item Достаточно пересчитать только одно дерево
+    \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Алгоритм имитации отжига}
 \begin{columns}
     \column{.5\textwidth}
-    Если значение ухудшилось, то переходим с вероятностью
+    Если значение ухудшилось, то переходим с вероятностью уменьшающейся от температуры (номера итерации)
     \[
     p=\alpha + (1 - \alpha) \frac{i}{N}
     \]
@@ -166,7 +171,8 @@
 
 \begin{frame}
     \frametitle{Использованные данные}
-    Использованные различные общедоступные датасеты с openml
+    Использованные различные общедоступные датасеты с OpenML
+
     \vfill
     \begin{center}
         \begin{tabular}{|l|l|l|}
@@ -190,31 +196,84 @@
         \hline
 
     \end{tabular}
+
+    \vfill
+    На каждом наборе параметров проводилось 10 тестов.
     \end{center}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Тестирование (Время работы)}
-    \begin{center}
-    \includegraphics[width=\textwidth]{graph_time1.png}
-    \end{center}
+    \frametitle{Тестирование (Время работы | Простой случай)}
+    Небольшой датасет, <30 поддеревьев
+    \vfill
+    \begin{columns}
+        \column{.7\textwidth}
+        \includegraphics[width=\textwidth]{time_easy.png}
+        \column{.3\textwidth}
+        \includegraphics[width=\textwidth]{time_legend.png}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Тестирование (Время работы)}
-    \begin{center}
-    \includegraphics[width=\textwidth]{graph_time2.png}
-    \end{center}
+    \frametitle{Тестирование (Время работы | Много деревьев)}
+    Небольшой датасет, >30 поддеревьев
+    \vfill
+    \begin{columns}
+        \column{.7\textwidth}
+        \includegraphics[width=\textwidth]{time_trees.png}
+        \column{.3\textwidth}
+        \includegraphics[width=\textwidth]{time_legend.png}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Тестирование (Ошибка)}
+    \frametitle{Тестирование (Время работы | Большой датасет)}
+    \vfill
+    \begin{columns}
+        \column{.7\textwidth}
+        \includegraphics[width=\textwidth]{time_big.png}
+        \column{.3\textwidth}
+        \includegraphics[width=\textwidth]{time_legend.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Тестирование (Ошибка | Простой случай)}
     % \[
         % error = \frac{min - min_{true} + max_{true} - max}{max_{true} - min_{true}}
     % \]
-    \begin{center}
-    \includegraphics[width=\textwidth]{graph_error.png}
-    \end{center}
+    \vfill
+    \begin{columns}
+        \column{.7\textwidth}
+        \includegraphics[width=\textwidth]{error_easy.png}
+        \column{.3\textwidth}
+        \includegraphics[width=\textwidth]{time_legend.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Тестирование (Ошибка | Много признаков)}
+    \vfill
+    \begin{columns}
+        \column{.7\textwidth}
+        \includegraphics[width=\textwidth]{error_features.png}
+        \column{.3\textwidth}
+        \includegraphics[width=\textwidth]{time_legend.png}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Итоги и планы}
+    Отжиг
+    \begin{itemize}
+            \item Проблема --- переход по трешхолду из другого поддерева
+            \item Решение --- хранить только трешхолды на пути до корня 
+    \end{itemize}
+    Эвристика
+    \begin{itemize}
+            \item Лучшие результаты
+            \item Даже с погрешностью 15\% точность выше чем у других алгоритмов
+    \end{itemize}
 \end{frame}
 
 \end{document}
