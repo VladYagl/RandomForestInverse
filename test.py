@@ -153,13 +153,13 @@ algos = [
         # ("basic", 0.05, 0), 
         # ("random", 0.0, 1000000), 
         # ("gena", 0.0, 1000), 
-        ("heuristic", 0.0, 0), 
+        # ("heuristic", 0.0, 0), 
         # ("heuristic", 0.05, 0),
-        # ("heuristic", 0.15, 0),
+        ("heuristic", 0.15, 0),
         ]
 
 datasets = [
-        # (datasets.load_diabetes(), 20, None, "diabetes"),
+        (datasets.load_diabetes(), 20, None, "diabetes"),
         # (datasets.load_diabetes(), 50, None, "diabetes"),
         # (datasets.load_boston(), 30, None, "boston"),
         # (datasets.load_boston(), 100, None, "boston"),
@@ -167,7 +167,7 @@ datasets = [
         # (datasets.fetch_openml(name="wisconsin"), 30, None, "wisconsin"),
         # (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
         # (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
-        (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
+        # (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
         # (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
         # (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
         # (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
