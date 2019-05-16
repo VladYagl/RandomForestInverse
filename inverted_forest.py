@@ -51,7 +51,7 @@ class InvertedForest(RandomForestRegressor):
             left_value, left_rect = self.intersect_dfs(node.left, left_limits, extr)
             right_value, right_rect = self.intersect_dfs(node.right, right_limits, extr)
 
-            if left_value < right_value and extr == 'min': 
+            if left_value < right_value and extr == 'min':
                 return left_value, left_rect
             else:
                 return right_value, right_rect

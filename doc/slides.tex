@@ -29,22 +29,20 @@
 }
 \end{frame}
 
-\begin{frame}
-    \frametitle{Задача}
+\begin{frame} \frametitle{Задача}
     \begin{itemize}
         \item \textbf{Дано:} Обученный регрессионный лес
         \item \textbf{Найти:} Области, где лес возвращает минимальное и максимальное значение
     \end{itemize}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Применение}
+\begin{frame} \frametitle{Применение}
     Random Forest:
     \begin{itemize}
-            \item Суррогатные функции для оптимизации
-            \item Хорошо обновляется при добавлении информации \pause{}
-            \item Последовательная оптимизация основанная на модели Sequential Model-Based Optimization (SMBO)
-            \item Sequential Model-based Algorithm configuration (SMAC)
+        \item Суррогатные функции для оптимизации
+        \item Хорошо обновляется при добавлении информации \pause{}
+        \item Последовательная оптимизация основанная на модели Sequential Model-Based Optimization (SMBO)
+        \item Sequential Model-based Algorithm configuration (SMAC)
     \end{itemize}
     \vfill
     \pause{}
@@ -52,37 +50,34 @@
     \vfill
 \end{frame}
 
-\begin{frame}
-    \frametitle{Random Forest}
+\begin{frame} \frametitle{Random Forest}
     \begin{columns}
         \column{.6\textwidth}
             \begin{itemize}
-                    \item Ансамбль деревьев принятия решения
-                    \item Каждое дерево обучено на случном подмножестве
-                    \item Результат: среднее всех деревьев 
-                    \item Пространство разбивается на прямоугольники по ''трешхолдам'' вершин
+                \item Ансамбль деревьев принятия решения
+                \item Каждое дерево обучено на случном подмножестве
+                \item Результат: среднее всех деревьев 
+                \item Пространство разбивается на прямоугольники по ''трешхолдам'' вершин
             \end{itemize}
         \column{.4\textwidth}
         \includegraphics[width=\textwidth]{random_forest.png}
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Эвристический алгоритм}
+\begin{frame} \frametitle{Эвристический алгоритм}
     \begin{columns}
         \column{.5\textwidth}
             \begin{itemize}
-                    \item Перебор по всем поддеревьям
-                    \item Для вершины храним минимум и максимум в поддереве
-                    \item Поддерживаем, что все поддеревья пересекаются
+                \item Перебор по всем поддеревьям
+                \item Для вершины храним минимум и максимум в поддереве
+                \item Поддерживаем, что все поддеревья пересекаются
             \end{itemize}
         \column{.5\textwidth}
             \includegraphics[width=\textwidth]{tree.png}
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Эвристический алгоритм}
+\begin{frame} \frametitle{Эвристический алгоритм}
 
     \begin{columns}
         \column{.75\textwidth}
@@ -100,8 +95,7 @@
     \]
 \end{frame}
 
-\begin{frame}
-    \frametitle{Эвристический алгоритм (Оптимизация 1)}
+\begin{frame} \frametitle{Эвристический алгоритм (Оптимизация 1)}
     Необязательно искать точное решение.
 
     \vspace{50px}
@@ -114,8 +108,7 @@
     Гарантирует точность $>\alpha$
 \end{frame}
 
-\begin{frame}
-    \frametitle{Эвристический алгоритм (Оптимизация 2)}
+\begin{frame} \frametitle{Эвристический алгоритм (Оптимизация 2)}
     Максимум в поддереве может не пересекаться с текущей областью
 
     \begin{columns}
@@ -129,8 +122,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-\frametitle{Алгоритм имитации отжига}
+\begin{frame} \frametitle{Алгоритм имитации отжига}
     \begin{center}
     \includegraphics[width=0.8\textwidth]{gena.png}
     \end{center}
@@ -141,8 +133,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Алгоритм имитации отжига}
+\begin{frame} \frametitle{Алгоритм имитации отжига}
 \begin{columns}
     \column{.5\textwidth}
     Если значение ухудшилось, то переходим с вероятностью уменьшающейся от температуры (номера итерации)
@@ -156,21 +147,19 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Сравниваемые алгоритмы}
+\begin{frame} \frametitle{Сравниваемые алгоритмы}
     \begin{itemize}
-            \item Перебор
-            \item Перебор с погрешностью $<5\%$
-            \item Случайный
-            \item Отжиг
-            \item Эвристика
-            \item Эвристика с погрешностью $<5\%$
-            \item Эвристика с погрешностью $<15\%$
+        \item Перебор
+        \item Перебор с погрешностью $<5\%$
+        \item Случайный
+        \item Отжиг
+        \item Эвристика
+        \item Эвристика с погрешностью $<5\%$
+        \item Эвристика с погрешностью $<15\%$
     \end{itemize}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Использованные данные}
+\begin{frame} \frametitle{Использованные данные}
     Использованные различные общедоступные датасеты с OpenML
 
     \vfill
@@ -202,8 +191,7 @@
     \end{center}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Тестирование (Время работы | Простой случай)}
+\begin{frame} \frametitle{Тестирование (Время работы | Простой случай)}
     Небольшой датасет, <30 поддеревьев
     \vfill
     \begin{columns}
@@ -214,8 +202,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Тестирование (Время работы | Много деревьев)}
+\begin{frame} \frametitle{Тестирование (Время работы | Много деревьев)}
     Небольшой датасет, >30 поддеревьев
     \vfill
     \begin{columns}
@@ -226,8 +213,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Тестирование (Время работы | Большой датасет)}
+\begin{frame} \frametitle{Тестирование (Время работы | Большой датасет)}
     \vfill
     \begin{columns}
         \column{.7\textwidth}
@@ -237,8 +223,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Тестирование (Ошибка | Простой случай)}
+\begin{frame} \frametitle{Тестирование (Ошибка | Простой случай)}
     % \[
         % error = \frac{min - min_{true} + max_{true} - max}{max_{true} - min_{true}}
     % \]
@@ -251,8 +236,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Тестирование (Ошибка | Много признаков)}
+\begin{frame} \frametitle{Тестирование (Ошибка | Много признаков)}
     \vfill
     \begin{columns}
         \column{.7\textwidth}
@@ -262,8 +246,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Итоги и планы}
+\begin{frame} \frametitle{Итоги и планы}
     Отжиг
     \begin{itemize}
             \item Проблема --- переход по трешхолду из другого поддерева

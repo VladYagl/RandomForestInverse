@@ -11,10 +11,11 @@ import statistics
 import sys
 import os
 
-try: 
+try:
     os.mkdir("log/")
-except:
+except BaseException:
     pass
+
 
 def run_tree(X, y, *args, **kwargs):
     tree = InvertedTree(*args, **kwargs)
@@ -59,13 +60,13 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
         if output:
             print("\n---- C++ -----------------------------")
         log = open("log/" + str(time.time()) + ".txt", "w")
-        if output: 
+        if output:
             other = Popen(name, stdin=PIPE, stdout=PIPE, encoding='utf8')
         else:
             other = Popen(name, stdin=PIPE, stdout=PIPE, stderr=log, encoding='utf8')
         start_time = time.time()
-        out, err = other.communicate(algo + '\n' + expr + '\n' + str(error) + '\n' + forest.dump() 
-                + '\n' + dataset_limits(X) + '\n' + str(iterations), timeout=timeout)
+        out, err = other.communicate(algo + '\n' + expr + '\n' + str(error) + '\n' + forest.dump()
+                                     + '\n' + dataset_limits(X) + '\n' + str(iterations), timeout=timeout)
         elapsed_time = time.time() - start_time
         split = out.split()
         algo_time = split[0]
@@ -98,10 +99,9 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
         #         formatter={'float_kind':lambda x: "\n\t%.6f" % x}, separator=";")
         return value, rect, np.float64(algo_time)
 
-
     forest = prep_forest(X, y, *args, **kwargs)
     f = open("test_forest.txt", "w")
-    f.write('min\n' + forest.dump()) 
+    f.write('min\n' + forest.dump())
     # print('forest saved to "test_forest.txt"')
 
     min_value, min_rect, time_min = call('min')
@@ -135,10 +135,10 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
 
 # min_value, max_value, min_rect, max_rect = run_slow_forest(X, y, n_estimators=30)
 # min_value, max_value, min_rect, max_rect = run_dumb_forest(X, y)
-# min_value, max_value, min_rect, max_rect, _ = run_other(X, y, "./cpp/daddy", random_state=1488, 
-        # n_estimators=60, algo="gena", iterations=100)
-# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488, 
-        # n_estimators=20, algo="random", iterations=2000000)
+# min_value, max_value, min_rect, max_rect, _ = run_other(X, y, "./cpp/daddy", random_state=1488,
+    # n_estimators=60, algo="gena", iterations=100)
+# min_value, max_value, min_rect, max_rect = run_other(X, y, "./cpp/daddy", random_state=1488,
+    # n_estimators=20, algo="random", iterations=2000000)
 # min_value, max_value, min_rect, max_rect, _ = run_other(X, y, "./cpp/daddy", random_state=1488, n_estimators=30)
 
 # print("Mininmum rect:", "OK" if not min_rect.is_empty() else "FAIL", "value:", min_value)
@@ -149,11 +149,11 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
 # -----------------MASS TESTING---------------------------------------------------------------------------------------------------
 
 algos = [
-        # ("basic", 0.0, 0), 
-        # ("basic", 0.05, 0), 
-        # ("random", 0.0, 1000000), 
-        # ("gena", 0.0, 1000), 
-        # ("heuristic", 0.0, 0), 
+        # ("basic", 0.0, 0),
+        # ("basic", 0.05, 0),
+        # ("random", 0.0, 1000000),
+        # ("gena", 0.0, 1000),
+        # ("heuristic", 0.0, 0),
         # ("heuristic", 0.05, 0),
         ("heuristic", 0.15, 0),
         ]
@@ -178,7 +178,7 @@ datasets = [
         # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
         ]
 
-n_tests = 10;
+n_tests = 10
 
 for i, dataset in enumerate(datasets):
     print(dataset[3], dataset[1], dataset[2])
@@ -189,17 +189,17 @@ for i, dataset in enumerate(datasets):
         error = algo[1]
         iters = algo[2]
 
-        try: 
+        try:
             times = []
             min_sum = 0
             max_sum = 0
             for random_state in range(n_tests):
                 sys.stderr.write("\r" + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|" +
-                        " Dataset: " + str(i) + "/" + str(len(datasets)) + " Algo: " + str(j) + "/" + str(len(algos)))
-                min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=random_state, 
-                        n_estimators=dataset[1], max_depth=dataset[2],
-                        # algo=name, error = error, iterations=iters, output=False, timeout=240)
-                        algo=name, error = error, iterations=iters, output=False, timeout=600)
+                                 " Dataset: " + str(i) + "/" + str(len(datasets)) + " Algo: " + str(j) + "/" + str(len(algos)))
+                min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=random_state,
+                                                                                n_estimators=dataset[1], max_depth=dataset[2],
+                                                                                # algo=name, error = error, iterations=iters, output=False, timeout=240)
+                                                                                algo=name, error=error, iterations=iters, output=False, timeout=600)
                 times.append(algo_time)
                 min_sum += min_value
                 max_sum += max_value
