@@ -1,13 +1,10 @@
 from inverted_forest import InvertedForest
 from inverted_tree import InvertedTree, Rect
-from visualisator import Visualiser
 from sklearn import datasets
-from sklearn.preprocessing import LabelEncoder
 from subprocess import Popen, PIPE
 
 import numpy as np
 import time
-import statistics
 import sys
 import os
 
@@ -103,7 +100,6 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
     f = open("test_forest.txt", "w")
     f.write('min\n' + forest.dump())
     # print('forest saved to "test_forest.txt"')
-
     min_value, min_rect, time_min = call('min')
     max_value, max_rect, time_max = call('max')
     return min_value, max_value, min_rect, max_rect, time_min + time_max
@@ -149,63 +145,92 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
 # -----------------MASS TESTING---------------------------------------------------------------------------------------------------
 
 algos = [
-        # ("basic", 0.0, 0),
-        # ("basic", 0.05, 0),
-        # ("random", 0.0, 1000000),
-        # ("gena", 0.0, 1000),
-        # ("heuristic", 0.0, 0),
-        # ("heuristic", 0.05, 0),
+        ("basic", 0.0, 0),
+        ("basic", 0.05, 0),
+        ("random", 0.0, 1000000),
+        ("random", 0.0, 10000),
+        ("gena", 0.0, 1000),
+        ("gena", 0.0, 100),
+        ("heuristic", 0.0, 0),
+        ("heuristic", 0.05, 0),
         ("heuristic", 0.15, 0),
         ]
 
 datasets = [
-        (datasets.load_diabetes(), 20, None, "diabetes"),
+        # (datasets.load_diabetes(), 20, None, "diabetes"),
         # (datasets.load_diabetes(), 50, None, "diabetes"),
         # (datasets.load_boston(), 30, None, "boston"),
         # (datasets.load_boston(), 100, None, "boston"),
         # (datasets.fetch_openml(name="autoPrice"), 30, None, "autoPrice"),
-        # (datasets.fetch_openml(name="wisconsin"), 30, None, "wisconsin"),
-        # (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
-        # (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
-        # (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
-        # (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
-        # (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
-        # (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
-        # (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
-        # (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
-        # (datasets.fetch_openml(name="mtp2"), 60, None, "mtp2"),
-        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
-        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
+        (datasets.fetch_openml(name="wisconsin"), 20, None, "wisconsin"),
+        (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
+        (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
+        (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
+        (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
+        (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
+        (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
+        (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
+        (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
+        (datasets.fetch_openml(name="mtp2"), 60, None, "mtp2"),
+        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
+        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
         ]
 
 n_tests = 10
+timeout = 240
+# timeout = 20
+output_dir = "./data/datasets/"
 
 for i, dataset in enumerate(datasets):
     print(dataset[3], dataset[1], dataset[2])
-    X = dataset[0].data
-    y = dataset[0].target
-    for j, algo in enumerate(algos):
-        name = algo[0]
-        error = algo[1]
-        iters = algo[2]
+    with open("%s%s%d-%s.csv" % (output_dir, dataset[3], dataset[1], str(dataset[2])), "w") as output:
+        output.write("algo, mean_error, std_error, mean_time, std_time\n")
+        X = dataset[0].data
+        y = dataset[0].target
 
-        try:
-            times = []
-            min_sum = 0
-            max_sum = 0
-            for random_state in range(n_tests):
-                sys.stderr.write("\r" + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|" +
-                                 " Dataset: " + str(i) + "/" + str(len(datasets)) + " Algo: " + str(j) + "/" + str(len(algos)))
-                min_value, max_value, min_rect, max_rect, algo_time = run_other(X, y, "./cpp/daddy", random_state=random_state,
-                                                                                n_estimators=dataset[1], max_depth=dataset[2],
-                                                                                # algo=name, error = error, iterations=iters, output=False, timeout=240)
-                                                                                algo=name, error=error, iterations=iters, output=False, timeout=600)
-                times.append(algo_time)
-                min_sum += min_value
-                max_sum += max_value
-            mean_time = statistics.mean(times)
-            sd_time = statistics.stdev(times)
-            sys.stderr.write("\r")
-            print(algo, ", ",  min_sum, ", ", max_sum, ", ", mean_time, ", ", sd_time)
-        except Exception as e:
-            print(algo, e)
+        mins = []
+        maxs = []
+        for random_state in range(n_tests):
+            sys.stderr.write(
+                "\rcorrect_algo Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|" +
+                " Dataset: " + str(i) + "/" + str(len(datasets))
+            )
+            min_value, max_value, min_rect, max_rect, algo_time = run_other(
+                X, y, "./cpp/daddy", random_state=random_state,
+                n_estimators=dataset[1], max_depth=dataset[2],
+                algo="heuristic", error=0.0, output=False, timeout=600)
+            mins.append(min_value)
+            maxs.append(max_value)
+
+        for j, algo in enumerate(algos):
+            name = algo[0]
+            error = algo[1]
+            iters = algo[2]
+
+            try:
+                times = []
+                errors = []
+                for random_state in range(n_tests):
+                    sys.stderr.write(
+                        "\r" + str(algo) + " Progress: |" + "-"*(random_state) + " "*(n_tests - random_state) + "|" +
+                        " Dataset: " + str(i) + "/" + str(len(datasets)) + " Algo: " + str(j) + "/" + str(len(algos))
+                    )
+                    min_value, max_value, min_rect, max_rect, algo_time = run_other(
+                        X, y, "./cpp/daddy", random_state=random_state,
+                        n_estimators=dataset[1], max_depth=dataset[2],
+                        algo=name, error=error, iterations=iters, output=False, timeout=timeout)
+                    times.append(algo_time)
+                    errors.append(
+                        (min_value - mins[random_state] + maxs[random_state] - max_value) /
+                        (maxs[random_state] - mins[random_state])
+                    )
+                sys.stderr.write("\r")
+                result = "%s, %lf, %lf, %lf, %lf" % (
+                    "%s-%lf-%d" % algo, np.mean(errors), np.std(errors), np.mean(times), np.std(times)
+                )
+                output.write(result + "\n")
+                print(result+"\t\t\t")
+            except Exception as e:
+                output.write("%s,,,,\n" % ("%s-%lf-%d" % algo))
+                sys.stderr.write("\r")
+                print("%s,,,, | %s |" % ("%s-%lf-%d" % algo, str(e)))

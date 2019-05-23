@@ -1,0 +1,19 @@
+#!/bin/bash
+
+conver_algo() {
+    printf "algo, mean_error, std_error, mean_time, std_time\n"
+    algo="$1"
+    for f in ./datasets/*.csv; do
+        name=$(basename "$f" '.csv' | sed -En "s/([^-]*)-None/\1/p")
+        sed -n "s/${algo}[^,]*,/$name,/p" "$f"
+    done
+}
+
+rm heuristic-* random.csv gena.csv basic-*.csv
+conver_algo gena > gena.csv
+conver_algo random > random.csv
+conver_algo heuristic-0.00 > heuristic-00.csv
+conver_algo heuristic-0.05 > heuristic-05.csv
+conver_algo heuristic-0.15 > heuristic-15.csv
+conver_algo basic-0.00 > basic-00.csv
+conver_algo basic-0.05 > basic-05.csv

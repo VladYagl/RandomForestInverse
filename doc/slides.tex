@@ -9,6 +9,20 @@
 
 \usepackage{graphicx}
 \usepackage{amssymb,amsmath}
+\usepackage{pgfplots, pgfplotstable}
+\pgfplotsset{compat=newest}
+\pgfplotstableread[col sep=comma]{../data/heuristic-00.csv}\heuristicno
+\pgfplotstableread[col sep=comma]{../data/heuristic-15.csv}\heuristicsome
+\pgfplotstableread[col sep=comma]{../data/random.csv}\random
+\makeatletter
+\pgfplotsset{
+    /pgfplots/flexible xticklabels from table/.code n args={3}{%
+        \pgfplotstableread[#3]{#1}\coordinate@table
+        \pgfplotstablegetcolumn{#2}\of{\coordinate@table}\to\pgfplots@xticklabels
+        \let\pgfplots@xticklabel=\pgfplots@user@ticklabel@list@x
+    }
+}
+\makeatother
 
 \graphicspath{{logo/}{pics/}}
 \beamertemplatenavigationsymbolsempty{}
@@ -257,6 +271,39 @@
             \item Лучшие результаты
             \item Даже с погрешностью 15\% точность выше чем у других алгоритмов
     \end{itemize}
+\end{frame}
+
+\begin{frame} \frametitle{Тест}
+    \begin{tikzpicture}
+    \begin{axis}[
+        enlarge x limits=0.04,
+        ybar=0pt, 
+        width=1.05\textwidth,
+        height=0.8\textwidth,
+        bar width=5pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Ошибка в \%,
+        flexible xticklabels from table={../data/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+    ]
+    \addplot 
+        [color=purple, fill=purple, fill opacity=0.33]
+        plot [error bars/.cd, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
+    \addplot 
+        [color=red, fill=red, fill opacity=0.33]
+        plot [error bars/.cd, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heuristicsome};
+    \addplot 
+        [color=blue, fill=blue, fill opacity=0.33]
+        plot [error bars/.cd, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heuristicno};
+
+    \end{axis}
+
+    \end{tikzpicture}
 \end{frame}
 
 \end{document}
