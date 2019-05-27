@@ -1,0 +1,5 @@
+Исходный код:
+https://github.com/VladYagl/RandomForestInverse, 
+
+Таблицы с результатами:
+https://docs.google.com/spreadsheets/d/1y0gfvOKlMpNarY0bKvE1l5-jUyIwolvDTYhi7AXY6O8/edit#gid=1283194239

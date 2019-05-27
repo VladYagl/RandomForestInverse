@@ -1,0 +1,4 @@
+algo, mean_error, std_error, mean_time, std_time
+house-8H20,,,0,150
+house-16H20, 0.299957, 0.061003, 148.781459, 0.910857
+kin8nm30, 0.219549, 0.024624, 48.998768, 1.108479

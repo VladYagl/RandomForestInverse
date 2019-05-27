@@ -1,0 +1,33 @@
+honest, Random Forest, iris, 0.062667, 0.037262
+honest, Random Forest, credit-g, 0.300000, 0.000000
+honest, Random Forest, monks-problems-2, 0.342755, 0.000000
+honest, Random Forest, letter, 0.481413, 0.081605
+honest, Random Forest, gina-agnostic, 0.184799, 0.025459
+honest, Random Forest, tic-tac-toe, 0.346552, 0.000000
+honest, Desicion Tree, iris, 0.119333, 0.107018
+honest, Desicion Tree, credit-g, 0.289800, 0.011513
+honest, Desicion Tree, monks-problems-2, 0.342755, 0.000000
+honest, Desicion Tree, letter, 0.799448, 0.104062
+honest, Desicion Tree, gina-agnostic, 0.240364, 0.027360
+honest, Desicion Tree, tic-tac-toe, 0.345682, 0.002607
+honest, SGD, iris, 0.016000, 0.004422
+honest, SGD, credit-g, 0.302000, 0.012450
+honest, SGD, monks-problems-2, 0.342588, 0.000500
+honest, SGD, letter, 0.348985, 0.009076
+honest, SGD, gina-agnostic, 0.166724, 0.002388
+honest, SGD, tic-tac-toe, 0.346445, 0.000313
+cheat, Random Forest, iris, 0.066667, 0.051554
+cheat, Random Forest, credit-g, 0.300000, 0.000000
+cheat, Random Forest, monks-problems-2, 0.342755, 0.000000
+cheat, Random Forest, letter, 0.501743, 0.088553
+cheat, Random Forest, gina-agnostic, 0.198205, 0.023170
+cheat, Random Forest, tic-tac-toe, 0.346552, 0.000000
+cheat, Desicion Tree, iris, 0.089333, 0.081932
+cheat, Desicion Tree, credit-g, 0.297400, 0.007800
+cheat, Desicion Tree, monks-problems-2, 0.342755, 0.000000
+cheat, Desicion Tree, letter, 0.800797, 0.062761
+cheat, Desicion Tree, gina-agnostic, 0.233934, 0.028726
+cheat, Desicion Tree, tic-tac-toe, 0.346552, 0.000000
+cheat, SGD, iris, 0.020667, 0.002000
+cheat, SGD, credit-g, 0.301400, 0.012068
+cheat, SGD, monks-problems-2, 0.342755, 0.000000

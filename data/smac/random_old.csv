@@ -1,0 +1,12 @@
+honest, Random Forest, iris, 0.062667, 0.037262
+honest, Random Forest, credit-g, 0.300000, 0.000000
+honest, Random Forest, monks-problems-2, 0.342755, 0.000000
+honest, Random Forest, letter, 0.481413, 0.081605
+honest, Random Forest, gina-agnostic, 0.184799, 0.025459
+honest, Random Forest, tic-tac-toe, 0.346552, 0.000000
+honest, Desicion Tree, iris, 0.119333, 0.107018
+honest, Desicion Tree, credit-g, 0.289800, 0.011513
+honest, Desicion Tree, monks-problems-2, 0.342755, 0.000000
+honest, Desicion Tree, letter, 0.799448, 0.104062
+honest, Desicion Tree, gina-agnostic, 0.240364, 0.027360
+honest, Desicion Tree, tic-tac-toe, 0.345682, 0.002607

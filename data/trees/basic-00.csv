@@ -1,0 +1,4 @@
+algo, mean_error, std_error, mean_time, std_time
+boston100,,,0,150
+diabetes50,,,0,150
+strikes100, 0.000000, 0.000000, 0.925377, 0.526726

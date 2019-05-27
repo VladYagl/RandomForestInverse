@@ -11,9 +11,6 @@
 \usepackage{amssymb,amsmath}
 \usepackage{pgfplots, pgfplotstable}
 \pgfplotsset{compat=newest}
-\pgfplotstableread[col sep=comma]{../data/heuristic-00.csv}\heuristicno
-\pgfplotstableread[col sep=comma]{../data/heuristic-15.csv}\heuristicsome
-\pgfplotstableread[col sep=comma]{../data/random.csv}\random
 \makeatletter
 \pgfplotsset{
     /pgfplots/flexible xticklabels from table/.code n args={3}{%
@@ -23,6 +20,13 @@
     }
 }
 \makeatother
+\definecolor{basicno}{rgb}{0.624,0.0,0.0}
+\definecolor{basicsome}{rgb}{0.424,0.0,0.0}
+\definecolor{random}{rgb}{0.0,0.100,0.424}
+\definecolor{gena}{rgb}{0.0,0.100,0.624}
+\definecolor{heuno}{rgb}{0.2,0.524,0.2}
+\definecolor{heusome}{rgb}{0.2,0.424,0.2}
+\definecolor{heumore}{rgb}{0.1,0.324,0.1}
 
 \graphicspath{{logo/}{pics/}}
 \beamertemplatenavigationsymbolsempty{}
@@ -71,7 +75,7 @@
                 \item Ансамбль деревьев принятия решения
                 \item Каждое дерево обучено на случном подмножестве
                 \item Результат: среднее всех деревьев 
-                \item Пространство разбивается на прямоугольники по ''трешхолдам'' вершин
+                \item Пространство разбивается на прямоугольники по границам разбиения вершин
             \end{itemize}
         \column{.4\textwidth}
         \includegraphics[width=\textwidth]{random_forest.png}
@@ -97,7 +101,7 @@
         \column{.75\textwidth}
             На каждом шаге рассматриваем n-мерный прямоугольник области
 
-            Шаг: разбиение по трешхолду вершины
+            Шаг: разбиение по границе вершины
         \column{.25\textwidth}
             \includegraphics[width=\textwidth]{split.png}
     \end{columns}
@@ -141,7 +145,7 @@
     \includegraphics[width=0.8\textwidth]{gena.png}
     \end{center}
     \begin{itemize}
-        \item Разбиваем пространство по всем трешхолдам
+        \item Разбиваем пространство по всем границам
         \item Случайные мутации по переходе в соседнюю клетку
         \item Достаточно пересчитать только одно дерево
     \end{itemize}
@@ -206,58 +210,349 @@
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Простой случай)}
-    Небольшой датасет, <30 поддеревьев
-    \vfill
-    \begin{columns}
-        \column{.7\textwidth}
-        \includegraphics[width=\textwidth]{time_easy.png}
-        \column{.3\textwidth}
-        \includegraphics[width=\textwidth]{time_legend.png}
-    \end{columns}
+    \pgfplotstableread[col sep=comma]{../data/easy/basic-00.csv}\basicno
+    \pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
+    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-00.csv}\heuno
+    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
+    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
+    \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
+    \pgfplotstableread[col sep=comma]{../data/easy/gena.csv}\gena
+
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        enlarge x limits=0.2,
+        ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        bar width=8pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Время работы,
+        flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+    ]
+    \addplot 
+        [color=basicno, fill=basicno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
+    \addplot 
+        [color=basicsome, fill=basicsome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
+    \addplot 
+        [color=random, fill=random, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
+    \addplot 
+        [color=gena, fill=gena, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
+    \addplot 
+        [color=heuno, fill=heuno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
+    \addplot 
+        [color=heusome, fill=heusome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
+    \addplot 
+        [color=heumore, fill=heumore, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
+
+    \legend{%
+        Перебор, 
+        Перебор с $<5\%$, 
+        Случайный, 
+        Отжиг, 
+        Эвристика, 
+        Эвристика с $<5\%$, 
+        Эвристика с $<15\%$ 
+    }
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Много деревьев)}
-    Небольшой датасет, >30 поддеревьев
-    \vfill
-    \begin{columns}
-        \column{.7\textwidth}
-        \includegraphics[width=\textwidth]{time_trees.png}
-        \column{.3\textwidth}
-        \includegraphics[width=\textwidth]{time_legend.png}
-    \end{columns}
+    \pgfplotstableread[col sep=comma]{../data/trees/basic-00.csv}\basicno
+    \pgfplotstableread[col sep=comma]{../data/trees/basic-05.csv}\basicsome
+    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-00.csv}\heuno
+    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-05.csv}\heusome
+    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-15.csv}\heumore
+    \pgfplotstableread[col sep=comma]{../data/trees/random.csv}\random
+    \pgfplotstableread[col sep=comma]{../data/trees/gena.csv}\gena
+
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        enlarge x limits=0.2,
+        ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        bar width=8pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Время работы,
+        flexible xticklabels from table={../data/trees/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+    ]
+    \addplot 
+        [color=basicno, fill=basicno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
+    \addplot 
+        [color=basicsome, fill=basicsome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
+    \addplot 
+        [color=random, fill=random, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
+    \addplot 
+        [color=gena, fill=gena, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
+    \addplot 
+        [color=heuno, fill=heuno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
+    \addplot 
+        [color=heusome, fill=heusome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
+    \addplot 
+        [color=heumore, fill=heumore, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
+
+    \legend{%
+        Перебор, 
+        Перебор с $<5\%$, 
+        Случайный, 
+        Отжиг, 
+        Эвристика, 
+        Эвристика с $<5\%$, 
+        Эвристика с $<15\%$ 
+    }
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Большой датасет)}
-    \vfill
-    \begin{columns}
-        \column{.7\textwidth}
-        \includegraphics[width=\textwidth]{time_big.png}
-        \column{.3\textwidth}
-        \includegraphics[width=\textwidth]{time_legend.png}
-    \end{columns}
+    \pgfplotstableread[col sep=comma]{../data/big/basic-00.csv}\basicno
+    \pgfplotstableread[col sep=comma]{../data/big/basic-05.csv}\basicsome
+    \pgfplotstableread[col sep=comma]{../data/big/heuristic-00.csv}\heuno
+    \pgfplotstableread[col sep=comma]{../data/big/heuristic-05.csv}\heusome
+    \pgfplotstableread[col sep=comma]{../data/big/heuristic-15.csv}\heumore
+    \pgfplotstableread[col sep=comma]{../data/big/random.csv}\random
+    \pgfplotstableread[col sep=comma]{../data/big/gena.csv}\gena
+
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        enlarge x limits=0.2,
+        ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        bar width=8pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Время работы,
+        flexible xticklabels from table={../data/big/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+        legend style={at={(0.02,0.98)},anchor=north west},
+    ]
+    \addplot 
+        [color=basicno, fill=basicno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
+    \addplot 
+        [color=basicsome, fill=basicsome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
+    \addplot 
+        [color=random, fill=random, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
+    \addplot 
+        [color=gena, fill=gena, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
+    \addplot 
+        [color=heuno, fill=heuno, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
+    \addplot 
+        [color=heusome, fill=heusome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
+    \addplot 
+        [color=heumore, fill=heumore, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
+
+    \legend{%
+        Перебор, 
+        Перебор с $<5\%$, 
+        Случайный, 
+        Отжиг, 
+        Эвристика, 
+        Эвристика с $<5\%$, 
+        Эвристика с $<15\%$ 
+    }
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Ошибка | Простой случай)}
-    % \[
-        % error = \frac{min - min_{true} + max_{true} - max}{max_{true} - min_{true}}
-    % \]
-    \vfill
-    \begin{columns}
-        \column{.7\textwidth}
-        \includegraphics[width=\textwidth]{error_easy.png}
-        \column{.3\textwidth}
-        \includegraphics[width=\textwidth]{time_legend.png}
-    \end{columns}
+    \pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
+    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
+    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
+    \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
+    \pgfplotstableread[col sep=comma]{../data/easy/gena.csv}\gena
+
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        ytick={0,0.1,...,0.9},
+        enlarge x limits=0.2,
+        ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        bar width=8pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Ошибка,
+        flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+    ]
+    \addplot 
+        [color=basicsome, fill=basicsome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\basicsome};
+    \addplot 
+        [color=random, fill=random, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
+    \addplot 
+        [color=gena, fill=gena, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\gena};
+    \addplot 
+        [color=heusome, fill=heusome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heusome};
+    \addplot 
+        [color=heumore, fill=heumore, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heumore};
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Ошибка | Много признаков)}
-    \vfill
-    \begin{columns}
-        \column{.7\textwidth}
-        \includegraphics[width=\textwidth]{error_features.png}
-        \column{.3\textwidth}
-        \includegraphics[width=\textwidth]{time_legend.png}
-    \end{columns}
+    \pgfplotstableread[col sep=comma]{../data/extra/heuristic-05.csv}\heusome
+    \pgfplotstableread[col sep=comma]{../data/extra/heuristic-15.csv}\heumore
+    \pgfplotstableread[col sep=comma]{../data/extra/random.csv}\random
+    \pgfplotstableread[col sep=comma]{../data/extra/gena.csv}\gena
+
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        ytick={0,0.1,...,0.9},
+        enlarge x limits=0.2,
+        ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        bar width=8pt,
+        ymin=0,
+        xlabel=Датасет,
+        ylabel=Ошибка,
+        flexible xticklabels from table={../data/extra/heuristic-15.csv}{algo}{col sep=comma},
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+    ]
+    \addplot 
+        [color=random, fill=random, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
+    \addplot 
+        [color=gena, fill=gena, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\gena};
+    \addplot 
+        [color=heusome, fill=heusome, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heusome};
+    \addplot 
+        [color=heumore, fill=heumore, fill opacity=0.33]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heumore};
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Практическое применение | Подбор гиперпараметров алгоритмов}
+        Последовательная оптимизация основанная на модели (SMBO) Sequential Model-based Algorithm configuration (SMAC)
+        \begin{enumerate}
+        \item Использует случайный лес в качестве регрессионной модели
+        \item В лес добавляются текущие результаты алгоритмов
+        \item По значениям леса выбираются новые конфигурации алгоритма
+        \end{enumerate}
+        Были модифицированны \texttt{automl} реализации с открытым исходным кодом: \texttt{random\_forest\_run} и \texttt{SMAC}
+\end{frame}
+
+\begin{frame} \frametitle{Тестирование | SMAC}
+    \pgfplotstableread[col sep=comma]{../data/smac/forest_old.csv}\forest
+    \pgfplotstableread[col sep=comma]{../data/smac/random_old.csv}\random
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        only marks,
+        enlarge x limits=0.2,
+        % ybar=0pt, 
+        width=1\textwidth,
+        height=0.8\textwidth,
+        % bar width=8pt,
+        ymin=0,
+        xlabel=Тест,
+        ylabel=Итоговая мера,
+        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+        xtick=data,
+        scatter/classes={a={mark=o}},
+    ]
+    \addplot 
+        [scatter, color=basicno]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y index=3, y error index=4]{\forest};
+    \addplot 
+        [scatter, color=heuno]
+        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x expr=\coordindex, y index=3, y error index=4]{\random};
+
+    \legend{%
+        Эвристика, 
+        Случайный, 
+    }
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Итоги и планы}
@@ -271,39 +566,6 @@
             \item Лучшие результаты
             \item Даже с погрешностью 15\% точность выше чем у других алгоритмов
     \end{itemize}
-\end{frame}
-
-\begin{frame} \frametitle{Тест}
-    \begin{tikzpicture}
-    \begin{axis}[
-        enlarge x limits=0.04,
-        ybar=0pt, 
-        width=1.05\textwidth,
-        height=0.8\textwidth,
-        bar width=5pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Ошибка в \%,
-        flexible xticklabels from table={../data/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-    ]
-    \addplot 
-        [color=purple, fill=purple, fill opacity=0.33]
-        plot [error bars/.cd, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
-    \addplot 
-        [color=red, fill=red, fill opacity=0.33]
-        plot [error bars/.cd, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heuristicsome};
-    \addplot 
-        [color=blue, fill=blue, fill opacity=0.33]
-        plot [error bars/.cd, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heuristicno};
-
-    \end{axis}
-
-    \end{tikzpicture}
 \end{frame}
 
 \end{document}
