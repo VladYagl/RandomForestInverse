@@ -4,7 +4,7 @@ from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter, UniformIntegerHyperparameter
 
 from sklearn.linear_model import SGDClassifier, Ridge
-from sklearn.neural_network import MLPRegressor
+from sklearn.neural_network import MLPRegressor, MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.tree import DecisionTreeClassifier
 
@@ -56,11 +56,12 @@ def rf_configs():
     return (cs, run, "Random Forest")
 
 
-def tree_configs():
+def tree_configs(scale=1.0):
     def run(dataset, seed, cfg):
         cfg = {k: cfg[k] for k in cfg}
-        cfg["criterion"] = criterion[cfg["criterion"]]
-        cfg["splitter"] = splitter[cfg["splitter"]]
+        if scale > 0.4:
+            cfg["criterion"] = criterion[cfg["criterion"]]
+            cfg["splitter"] = splitter[cfg["splitter"]]
         clf = DecisionTreeClassifier(random_state=seed, **cfg)
         scores = cross_val_score(clf, dataset.data, dataset.target, cv=5)
         return 1 - np.mean(scores)
@@ -69,15 +70,18 @@ def tree_configs():
     splitter = ["best", "random"]
     cs = ConfigurationSpace()
     cs.add_hyperparameters([
-        UniformIntegerHyperparameter("criterion", 0, 1),
-        UniformIntegerHyperparameter("splitter", 0, 1),
-        UniformIntegerHyperparameter("max_depth", 10, 1000),
-        UniformIntegerHyperparameter("min_samples_leaf", 1, 200),
-        UniformIntegerHyperparameter("min_samples_split", 2, 100),
-        UniformFloatHyperparameter("min_weight_fraction_leaf", 0.0, 0.5),
-        UniformFloatHyperparameter("min_impurity_decrease", 0.0, 0.9),
+        UniformIntegerHyperparameter("max_depth", 10, 1500*scale),
+        UniformIntegerHyperparameter("min_samples_leaf", 1, 400*scale),
+        UniformIntegerHyperparameter("min_samples_split", 2, 300*scale),
+        UniformFloatHyperparameter("min_weight_fraction_leaf", 0.0, 0.5*scale),
+        UniformFloatHyperparameter("min_impurity_decrease", 0.0, 1.0*scale),
     ])
-    return (cs, run, "Desicion Tree")
+    if scale > 0.4:
+        cs.add_hyperparameters([
+            UniformIntegerHyperparameter("criterion", 0, 1),
+            UniformIntegerHyperparameter("splitter", 0, 1),
+        ])
+    return (cs, run, "Desicion Tree, %.2lf" % scale)
 
 
 def ridge_configs():
@@ -100,6 +104,28 @@ def ridge_configs():
     return (cs, run, "Ridge")
 
 
+def clf_mlp_configs():
+    def run(dataset, seed, cfg):
+        cfg = {k: cfg[k] for k in cfg}
+        cfg["activation"] = activation[cfg["activation"]]
+        cfg["solver"] = solver[cfg["solver"]]
+        clf = MLPClassifier(random_state=seed, **cfg)
+        scores = cross_val_score(clf, dataset.data, dataset.target, cv=5)
+        return 1 - np.mean(scores)
+
+    activation = ["identity", "logistic", "tanh", "relu"]
+    solver = ["lbfgs", "sgd", "adam"]
+    cs = ConfigurationSpace()
+    cs.add_hyperparameters([
+        UniformIntegerHyperparameter("activation", 0, 3),
+        UniformIntegerHyperparameter("solver", 0, 2),
+        UniformFloatHyperparameter("tol", 1e-7, 1e-1),
+        UniformFloatHyperparameter("alpha", 1e-7, 1e-1),
+        UniformIntegerHyperparameter("max_iter", 10, 1000),
+    ])
+    return (cs, run, "Clf MLP")
+
+
 def mlp_configs():
     def run(dataset, seed, cfg):
         cfg = {k: cfg[k] for k in cfg}
@@ -120,7 +146,7 @@ def mlp_configs():
         UniformFloatHyperparameter("alpha", 1e-7, 1e-1),
         UniformIntegerHyperparameter("max_iter", 10, 1000),
     ])
-    return (cs, run, "Ridge")
+    return (cs, run, "MLP")
 
 def rf_reg_configs():
     def run(dataset, seed, cfg):

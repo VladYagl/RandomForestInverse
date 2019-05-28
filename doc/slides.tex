@@ -40,6 +40,7 @@
 \begin{document}
 
 \begin{frame}
+\thispagestyle{empty}
 \maketitle
 {\small 
     \textbf{Формальный научный руководитель:}\par Фильченков Андрей Александрович\par
@@ -68,14 +69,14 @@
     \vfill
 \end{frame}
 
-\begin{frame} \frametitle{Random Forest}
+\begin{frame} \frametitle{Случайный лес}
     \begin{columns}
         \column{.6\textwidth}
             \begin{itemize}
                 \item Ансамбль деревьев принятия решения
-                \item Каждое дерево обучено на случном подмножестве
+                \item Каждое дерево обучено на случной подвыборке
                 \item Результат: среднее всех деревьев 
-                \item Пространство разбивается на прямоугольники по границам разбиения вершин
+                \item Пространство разбивается на прямоугольники по границам разветвления вершин
             \end{itemize}
         \column{.4\textwidth}
         \includegraphics[width=\textwidth]{random_forest.png}
@@ -91,7 +92,11 @@
                 \item Поддерживаем, что все поддеревья пересекаются
             \end{itemize}
         \column{.5\textwidth}
-            \includegraphics[width=\textwidth]{tree.png}
+            \begin{center}
+            \includegraphics[height=0.8\textheight]{tree.png}
+
+            алгоритм рассматривает синие вершины двух деревьев
+            \end{center}
     \end{columns}
 \end{frame}
 
@@ -123,7 +128,7 @@
         value[v] < \alpha current
     \]
 
-    Гарантирует точность $>\alpha$
+    Гарантирует погрешность $<\alpha$
 \end{frame}
 
 \begin{frame} \frametitle{Эвристический алгоритм (Оптимизация 2)}
@@ -549,6 +554,60 @@
         Эвристика, 
         Случайный, 
     }
+
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Тестирование | SMAC}
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_forest.csv}\forestiris
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_random.csv}\randomiris
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_forest.csv}\forestletter
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_random.csv}\randomletter
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_forest.csv}\forestgina
+    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_random.csv}\randomgina
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        enlarge x limits=0.2,
+        width=1\textwidth,
+        height=0.8\textwidth,
+        ymin=0,
+        xlabel=Размер пространства гиперпараметров,
+        ylabel=1-fмера,
+        xtick=data,
+        scatter/classes={a={mark=o}},
+    ]
+    \addplot 
+        [scatter, color=heusome]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\forestiris};
+    \addplot 
+        [scatter, color=heuno]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\randomiris};
+    \addplot 
+        [scatter, color=basicsome]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\forestletter};
+    \addplot 
+        [scatter, color=basicno]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\randomletter};
+    \addplot 
+        [scatter, color=gena]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\forestgina};
+    \addplot 
+        [scatter, color=random]
+        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+        table[x index=2, y index=4, y error index=5]{\randomgina};
+
+    % \legend{%
+    %     Эвристика, 
+    %     Случайный, 
+    % }
 
     \end{axis}
     \end{tikzpicture}
