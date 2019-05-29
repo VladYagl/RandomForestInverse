@@ -11,22 +11,9 @@
 \usepackage{amssymb,amsmath}
 \usepackage{pgfplots, pgfplotstable}
 \pgfplotsset{compat=newest}
-\makeatletter
-\pgfplotsset{
-    /pgfplots/flexible xticklabels from table/.code n args={3}{%
-        \pgfplotstableread[#3]{#1}\coordinate@table
-        \pgfplotstablegetcolumn{#2}\of{\coordinate@table}\to\pgfplots@xticklabels
-        \let\pgfplots@xticklabel=\pgfplots@user@ticklabel@list@x
-    }
-}
-\makeatother
-\definecolor{basicno}{rgb}{0.624,0.0,0.0}
-\definecolor{basicsome}{rgb}{0.424,0.0,0.0}
-\definecolor{random}{rgb}{0.0,0.100,0.424}
-\definecolor{gena}{rgb}{0.0,0.100,0.624}
-\definecolor{heuno}{rgb}{0.2,0.524,0.2}
-\definecolor{heusome}{rgb}{0.2,0.424,0.2}
-\definecolor{heumore}{rgb}{0.1,0.324,0.1}
+\input{./include/labels.tex}
+\newcommand{\graphwidth}{\textwidth}
+\newcommand{\graphheight}{0.8\textheight}
 
 \graphicspath{{logo/}{pics/}}
 \beamertemplatenavigationsymbolsempty{}
@@ -59,7 +46,8 @@
     Random Forest:
     \begin{itemize}
         \item Суррогатные функции для оптимизации
-        \item Хорошо обновляется при добавлении информации \pause{}
+        \item Хорошо обновляется при добавлении информации
+        \item Сложно обратимая функция \pause{}
         \item Последовательная оптимизация основанная на модели Sequential Model-Based Optimization (SMBO)
         \item Sequential Model-based Algorithm configuration (SMAC)
     \end{itemize}
@@ -81,6 +69,27 @@
         \column{.4\textwidth}
         \includegraphics[width=\textwidth]{random_forest.png}
     \end{columns}
+\end{frame}
+
+\begin{frame} \frametitle{Алгоритм имитации отжига}
+    \begin{center}
+    \includegraphics[width=0.8\textwidth]{gena.png}
+    \end{center}
+    \only<1>{%
+        \begin{itemize}
+            \item Разбиваем пространство по всем границам
+            \item Случайные мутации по переходе в соседнюю клетку
+            \item Достаточно пересчитать только одно дерево
+            \item Если значение ухудшилось, то переходим с вероятностью уменьшающейся от температурного параметра
+        \end{itemize}
+    }
+    \only<2>{%
+        \begin{itemize}
+            \item Рассматривает лес как 'чёрный ящик', не использует внутреннею структуру случайного леса
+            \item Не работает при большом количестве признаков (>1000)
+            \item Не показал желаемых результатов
+        \end{itemize}
+    }
 \end{frame}
 
 \begin{frame} \frametitle{Эвристический алгоритм}
@@ -145,37 +154,11 @@
     \end{columns}
 \end{frame}
 
-\begin{frame} \frametitle{Алгоритм имитации отжига}
-    \begin{center}
-    \includegraphics[width=0.8\textwidth]{gena.png}
-    \end{center}
-    \begin{itemize}
-        \item Разбиваем пространство по всем границам
-        \item Случайные мутации по переходе в соседнюю клетку
-        \item Достаточно пересчитать только одно дерево
-    \end{itemize}
-\end{frame}
-
-\begin{frame} \frametitle{Алгоритм имитации отжига}
-\begin{columns}
-    \column{.5\textwidth}
-    Если значение ухудшилось, то переходим с вероятностью уменьшающейся от температуры (номера итерации)
-    \[
-    p=\alpha + (1 - \alpha) \frac{i}{N}
-    \]
-    N --- количество итераций\\
-    i --- номер итераций
-    \column{.5\textwidth}
-    \includegraphics[width=\textwidth]{gena_move.png}
-\end{columns}
-\end{frame}
-
 \begin{frame} \frametitle{Сравниваемые алгоритмы}
     \begin{itemize}
         \item Перебор
         \item Перебор с погрешностью $<5\%$
         \item Случайный
-        \item Отжиг
         \item Эвристика
         \item Эвристика с погрешностью $<5\%$
         \item Эвристика с погрешностью $<15\%$
@@ -187,443 +170,77 @@
 
     \vfill
     \begin{center}
-        \begin{tabular}{|l|l|l|}
-
-        \hline
-
-        название        & элементы  & признаки \\
-
-        \hline
-
-        diabetes        & 442    & 9     \\
-        boston          & 506    & 12    \\
-        autoPrice       & 159    & 16    \\
-        wisconsin       & 194    & 33    \\
-        strikes         & 625    & 7     \\
-        kin8nm          & 8192   & 9     \\
-        house\_8L       & 22784  & 9     \\
-        house\_16H      & 22784  & 9     \\
-        mtp2            & 274    & 1143  \\
-
-        \hline
-
-    \end{tabular}
-
-    \vfill
-    На каждом наборе параметров проводилось 10 тестов.
+        \input{./include/data_table.tex}
+        \vfill
+        На каждом наборе параметров проводилось 10 тестов.
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Простой случай)}
-    \pgfplotstableread[col sep=comma]{../data/easy/basic-00.csv}\basicno
-    \pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
-    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-00.csv}\heuno
-    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
-    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
-    \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
-    \pgfplotstableread[col sep=comma]{../data/easy/gena.csv}\gena
-
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        enlarge x limits=0.2,
-        ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        bar width=8pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Время работы,
-        flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-    ]
-    \addplot 
-        [color=basicno, fill=basicno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
-    \addplot 
-        [color=basicsome, fill=basicsome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
-    \addplot 
-        [color=random, fill=random, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
-    \addplot 
-        [color=gena, fill=gena, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
-    \addplot 
-        [color=heuno, fill=heuno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
-    \addplot 
-        [color=heusome, fill=heusome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
-    \addplot 
-        [color=heumore, fill=heumore, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
-
-    \legend{%
-        Перебор, 
-        Перебор с $<5\%$, 
-        Случайный, 
-        Отжиг, 
-        Эвристика, 
-        Эвристика с $<5\%$, 
-        Эвристика с $<15\%$ 
-    }
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/time_easy.tex}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Много деревьев)}
-    \pgfplotstableread[col sep=comma]{../data/trees/basic-00.csv}\basicno
-    \pgfplotstableread[col sep=comma]{../data/trees/basic-05.csv}\basicsome
-    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-00.csv}\heuno
-    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-05.csv}\heusome
-    \pgfplotstableread[col sep=comma]{../data/trees/heuristic-15.csv}\heumore
-    \pgfplotstableread[col sep=comma]{../data/trees/random.csv}\random
-    \pgfplotstableread[col sep=comma]{../data/trees/gena.csv}\gena
-
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        enlarge x limits=0.2,
-        ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        bar width=8pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Время работы,
-        flexible xticklabels from table={../data/trees/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-    ]
-    \addplot 
-        [color=basicno, fill=basicno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
-    \addplot 
-        [color=basicsome, fill=basicsome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
-    \addplot 
-        [color=random, fill=random, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
-    \addplot 
-        [color=gena, fill=gena, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
-    \addplot 
-        [color=heuno, fill=heuno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
-    \addplot 
-        [color=heusome, fill=heusome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
-    \addplot 
-        [color=heumore, fill=heumore, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
-
-    \legend{%
-        Перебор, 
-        Перебор с $<5\%$, 
-        Случайный, 
-        Отжиг, 
-        Эвристика, 
-        Эвристика с $<5\%$, 
-        Эвристика с $<15\%$ 
-    }
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/time_trees.tex}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Большой датасет)}
-    \pgfplotstableread[col sep=comma]{../data/big/basic-00.csv}\basicno
-    \pgfplotstableread[col sep=comma]{../data/big/basic-05.csv}\basicsome
-    \pgfplotstableread[col sep=comma]{../data/big/heuristic-00.csv}\heuno
-    \pgfplotstableread[col sep=comma]{../data/big/heuristic-05.csv}\heusome
-    \pgfplotstableread[col sep=comma]{../data/big/heuristic-15.csv}\heumore
-    \pgfplotstableread[col sep=comma]{../data/big/random.csv}\random
-    \pgfplotstableread[col sep=comma]{../data/big/gena.csv}\gena
-
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        enlarge x limits=0.2,
-        ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        bar width=8pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Время работы,
-        flexible xticklabels from table={../data/big/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-        legend style={at={(0.02,0.98)},anchor=north west},
-    ]
-    \addplot 
-        [color=basicno, fill=basicno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicno};
-    \addplot 
-        [color=basicsome, fill=basicsome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\basicsome};
-    \addplot 
-        [color=random, fill=random, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\random};
-    \addplot 
-        [color=gena, fill=gena, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\gena};
-    \addplot 
-        [color=heuno, fill=heuno, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heuno};
-    \addplot 
-        [color=heusome, fill=heusome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heusome};
-    \addplot 
-        [color=heumore, fill=heumore, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_time, y error=std_time]{\heumore};
-
-    \legend{%
-        Перебор, 
-        Перебор с $<5\%$, 
-        Случайный, 
-        Отжиг, 
-        Эвристика, 
-        Эвристика с $<5\%$, 
-        Эвристика с $<15\%$ 
-    }
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/time_big.tex}
     \end{center}
 \end{frame}
 
-\begin{frame} \frametitle{Тестирование (Ошибка | Простой случай)}
-    \pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
-    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
-    \pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
-    \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
-    \pgfplotstableread[col sep=comma]{../data/easy/gena.csv}\gena
-
+\begin{frame} \frametitle{Тестирование (Погрешность | Простой случай)}
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        ytick={0,0.1,...,0.9},
-        enlarge x limits=0.2,
-        ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        bar width=8pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Ошибка,
-        flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-    ]
-    \addplot 
-        [color=basicsome, fill=basicsome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\basicsome};
-    \addplot 
-        [color=random, fill=random, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
-    \addplot 
-        [color=gena, fill=gena, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\gena};
-    \addplot 
-        [color=heusome, fill=heusome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heusome};
-    \addplot 
-        [color=heumore, fill=heumore, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heumore};
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/error_easy.tex}
     \end{center}
 \end{frame}
 
-\begin{frame} \frametitle{Тестирование (Ошибка | Много признаков)}
-    \pgfplotstableread[col sep=comma]{../data/extra/heuristic-05.csv}\heusome
-    \pgfplotstableread[col sep=comma]{../data/extra/heuristic-15.csv}\heumore
-    \pgfplotstableread[col sep=comma]{../data/extra/random.csv}\random
-    \pgfplotstableread[col sep=comma]{../data/extra/gena.csv}\gena
-
+\begin{frame} \frametitle{Тестирование (Погрешность | Много признаков)}
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        ytick={0,0.1,...,0.9},
-        enlarge x limits=0.2,
-        ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        bar width=8pt,
-        ymin=0,
-        xlabel=Датасет,
-        ylabel=Ошибка,
-        flexible xticklabels from table={../data/extra/heuristic-15.csv}{algo}{col sep=comma},
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-    ]
-    \addplot 
-        [color=random, fill=random, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\random};
-    \addplot 
-        [color=gena, fill=gena, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\gena};
-    \addplot 
-        [color=heusome, fill=heusome, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heusome};
-    \addplot 
-        [color=heumore, fill=heumore, fill opacity=0.33]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y=mean_error, y error=std_error]{\heumore};
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/error_big.tex}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Практическое применение | Подбор гиперпараметров алгоритмов}
+    \only<1>{%
         Последовательная оптимизация основанная на модели (SMBO) Sequential Model-based Algorithm configuration (SMAC)
         \begin{enumerate}
         \item Использует случайный лес в качестве регрессионной модели
         \item В лес добавляются текущие результаты алгоритмов
         \item По значениям леса выбираются новые конфигурации алгоритма
         \end{enumerate}
-        Были модифицированны \texttt{automl} реализации с открытым исходным кодом: \texttt{random\_forest\_run} и \texttt{SMAC}
-\end{frame}
-
-\begin{frame} \frametitle{Тестирование | SMAC}
-    \pgfplotstableread[col sep=comma]{../data/smac/forest_old.csv}\forest
-    \pgfplotstableread[col sep=comma]{../data/smac/random_old.csv}\random
-    \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        only marks,
-        enlarge x limits=0.2,
-        % ybar=0pt, 
-        width=1\textwidth,
-        height=0.8\textwidth,
-        % bar width=8pt,
-        ymin=0,
-        xlabel=Тест,
-        ylabel=Итоговая мера,
-        xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-        xtick=data,
-        scatter/classes={a={mark=o}},
-    ]
-    \addplot 
-        [scatter, color=basicno]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y index=3, y error index=4]{\forest};
-    \addplot 
-        [scatter, color=heuno]
-        plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x expr=\coordindex, y index=3, y error index=4]{\random};
-
-    \legend{%
-        Эвристика, 
-        Случайный, 
+        Были модифицированы \texttt{automl} реализации с открытым исходным кодом: \texttt{random\_forest\_run} и \texttt{SMAC}
     }
-
-    \end{axis}
-    \end{tikzpicture}
-    \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование | SMAC}
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_forest.csv}\forestiris
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_random.csv}\randomiris
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_forest.csv}\forestletter
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_random.csv}\randomletter
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_forest.csv}\forestgina
-    \pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_random.csv}\randomgina
     \begin{center}
-    \begin{tikzpicture}
-    \begin{axis}[
-        enlarge x limits=0.2,
-        width=1\textwidth,
-        height=0.8\textwidth,
-        ymin=0,
-        xlabel=Размер пространства гиперпараметров,
-        ylabel=1-fмера,
-        xtick=data,
-        scatter/classes={a={mark=o}},
-    ]
-    \addplot 
-        [scatter, color=heusome]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\forestiris};
-    \addplot 
-        [scatter, color=heuno]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\randomiris};
-    \addplot 
-        [scatter, color=basicsome]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\forestletter};
-    \addplot 
-        [scatter, color=basicno]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\randomletter};
-    \addplot 
-        [scatter, color=gena]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\forestgina};
-    \addplot 
-        [scatter, color=random]
-        % plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-        table[x index=2, y index=4, y error index=5]{\randomgina};
-
-    % \legend{%
-    %     Эвристика, 
-    %     Случайный, 
-    % }
-
-    \end{axis}
-    \end{tikzpicture}
+        \input{./include/smac_general.tex}
     \end{center}
 \end{frame}
 
-\begin{frame} \frametitle{Итоги и планы}
-    Отжиг
+\begin{frame} \frametitle{Тестирование | SMAC, размер пространства}
+    \begin{center}
+        \input{./include/smac_size.tex}
+    \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Тестирование | SMAC, количество запусков алгоритма}
+    \begin{center}
+        \input{./include/smac_count.tex}
+    \end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Итоги}
     \begin{itemize}
-            \item Проблема --- переход по трешхолду из другого поддерева
-            \item Решение --- хранить только трешхолды на пути до корня 
-    \end{itemize}
-    Эвристика
-    \begin{itemize}
-            \item Лучшие результаты
-            \item Даже с погрешностью 15\% точность выше чем у других алгоритмов
+        \item Разработан алгоритм оптимизации случайного леса
+        \item Проведено его сравнение с существующими методами
+        \item Проверено его практическое применение в сочетании с другими алгоритмами
     \end{itemize}
 \end{frame}
 

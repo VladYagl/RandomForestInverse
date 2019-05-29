@@ -9,21 +9,37 @@ import warnings
 warnings.filterwarnings("ignore")
 
 scenarios = [
+   # (Scenario({
+   #      "run_obj": "quality",
+   #      "runcount_limit": 50,
+   #      "deterministic": "true",
+   #      "memory_limit": 3072,
+   #      "output_dir": "./logs/"
+   #  }), "normal"),
+
+    (Scenario({
+        "run_obj": "quality",
+        "runcount_limit": 400,
+        "deterministic": "true",
+        "memory_limit": 3072,
+        "output_dir": "./logs/"
+    }), "huge"),
+
     (Scenario({
         "run_obj": "quality",
         "runcount_limit": 50,
         "deterministic": "true",
         "memory_limit": 3072,
-        "acq_opt_challengers": 100,
         "output_dir": "./logs/"
     }), "normal"),
 ]
 
 confs = [
-    configs.tree_configs(),
-    configs.tree_configs(0.8),
-    configs.tree_configs(0.5),
-    configs.tree_configs(0.2),
+    configs.tree_configs(0.9),
+    # configs.tree_configs(),
+    # configs.tree_configs(0.8),
+    # configs.tree_configs(0.5),
+    # configs.tree_configs(0.2),
     # configs.clf_mlp_configs(),
     # configs.rf_configs(),
     # configs.sgd_configs(),
@@ -39,14 +55,14 @@ confs = [
 # ]
 
 
-datas = [(datasets.load_iris(), "iris")]
-run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_iris_")
+# datas = [(datasets.load_iris(), "iris")]
+# run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_iris_")
 datas = [(datasets.fetch_openml(name="letter"), "letter")]
-run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_leter_")
-datas = [(datasets.fetch_openml(name="gina_agnostic"), "gina-agnostic")]
-run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_gina_")
+# run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_leter_")
+# datas = [(datasets.fetch_openml(name="gina_agnostic"), "gina-agnostic")]
+# run_tests(scenarios, confs, datas, tests_count=5, output_dir="../data/smac/limits/new_gina_")
 
-run_tests(scenarios, confs, datas, tests_count=10, output_dir="../data/smac/limits/new_")
+run_tests(scenarios, confs, datas, tests_count=10, output_dir="./HUGE_")
 
 # datas = [
 #     # (datasets.load_diabetes(), "diabetes"),
