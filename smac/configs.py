@@ -20,10 +20,10 @@ def sgd_configs():
 
     cs = ConfigurationSpace()
     loss = ["hinge", "log", "modified_huber", "squared_hinge", "perceptron"]
-    penalty = ["l1", "l2", "elasticnet"]
+    penalty = ["l1", "l2", "elasticnet", "l1", "l2", "elasticnet"]
     cs.add_hyperparameters([
         UniformIntegerHyperparameter("loss", 0, 4),
-        UniformIntegerHyperparameter("penalty", 0, 2),
+        UniformIntegerHyperparameter("penalty", 0, 5),
         UniformFloatHyperparameter("alpha", 1e-7, 1e-1),
         UniformFloatHyperparameter("l1_ratio", 0.0, 1.0),
         UniformFloatHyperparameter("tol", 1e-7, 1e-1),
@@ -42,11 +42,11 @@ def rf_configs():
         cfg = {k: cfg[k] for k in cfg}
         return 1 - np.mean(scores)
 
-    criterion = ["gini", "entropy"]
+    criterion = ["gini", "gini", "gini", "entropy", "entropy", "entropy"]
     cs = ConfigurationSpace()
     cs.add_hyperparameters([
         UniformIntegerHyperparameter("n_estimators", 1, 200),
-        UniformIntegerHyperparameter("criterion", 0, 1),
+        UniformIntegerHyperparameter("criterion", 0, 5),
         UniformIntegerHyperparameter("max_depth", 10, 1000),
         UniformIntegerHyperparameter("min_samples_leaf", 1, 200),
         UniformIntegerHyperparameter("min_samples_split", 2, 100),
@@ -66,8 +66,8 @@ def tree_configs(scale=1.0):
         scores = cross_val_score(clf, dataset.data, dataset.target, cv=5)
         return 1 - np.mean(scores)
 
-    criterion = ["gini", "entropy"]
-    splitter = ["best", "random"]
+    criterion = ["gini", "entropy", "gini", "entropy", "gini", "entropy"]
+    splitter = ["best", "random", "best", "random", "best", "random"]
     cs = ConfigurationSpace()
     cs.add_hyperparameters([
         UniformIntegerHyperparameter("max_depth", 10, 1500*scale),
@@ -78,8 +78,8 @@ def tree_configs(scale=1.0):
     ])
     if scale > 0.4:
         cs.add_hyperparameters([
-            UniformIntegerHyperparameter("criterion", 0, 1),
-            UniformIntegerHyperparameter("splitter", 0, 1),
+            UniformIntegerHyperparameter("criterion", 0, 5),
+            UniformIntegerHyperparameter("splitter", 0, 5),
         ])
     return (cs, run, "Desicion Tree, %.2lf" % scale)
 
@@ -113,12 +113,12 @@ def clf_mlp_configs():
         scores = cross_val_score(clf, dataset.data, dataset.target, cv=5)
         return 1 - np.mean(scores)
 
-    activation = ["identity", "logistic", "tanh", "relu"]
-    solver = ["lbfgs", "sgd", "adam"]
+    activation = ["identity", "logistic", "tanh", "relu", "identity", "logistic", "tanh", "relu"]
+    solver = ["lbfgs", "sgd", "adam", "lbfgs", "sgd", "adam"]
     cs = ConfigurationSpace()
     cs.add_hyperparameters([
-        UniformIntegerHyperparameter("activation", 0, 3),
-        UniformIntegerHyperparameter("solver", 0, 2),
+        UniformIntegerHyperparameter("activation", 0, 7),
+        UniformIntegerHyperparameter("solver", 0, 5),
         UniformFloatHyperparameter("tol", 1e-7, 1e-1),
         UniformFloatHyperparameter("alpha", 1e-7, 1e-1),
         UniformIntegerHyperparameter("max_iter", 10, 1000),

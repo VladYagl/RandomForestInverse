@@ -6,7 +6,7 @@ import numpy as np
 from smac.facade.smac_facade import SMAC
 from smac.utils.util_funcs import get_types
 from smac.epm.rf_with_instances import RandomForestWithInstances
-from smac.optimizer.ei_optimization import ForestSearch, RandomSearch
+from smac.optimizer.ei_optimization import ForestSearch, InterleavedLocalAndRandomSearch
 from smac.optimizer.acquisition import EI
 
 
@@ -17,7 +17,7 @@ def optimize(scenario, run, forest=False, seed=8):
     if forest:
         optimizer = ForestSearch(ei, scenario.cs, ratio=0.8)
     else:
-        optimizer = RandomSearch(ei, scenario.cs)
+        optimizer = InterleavedLocalAndRandomSearch(ei, scenario.cs)
 
     scenario.output_dir = "%s_%s_%d_%lf" % ("./logs/run_", "forest_" if forest else "random_", seed, time.time())
     smac = SMAC(
