@@ -1,0 +1,80 @@
+\newcommand{\addplotsmac}[5] {%
+\addplot 
+    [scatter, color=#2]
+    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both,
+    y explicit] table[x index=#3, y index=#4, y error index=#5]{#1}; 
+}
+
+\newcommand{\smacsize} [2] {%
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_forest.csv}\forestiris
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_iris_random.csv}\randomiris
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_forest.csv}\forestletter
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_leter_random.csv}\randomletter
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_forest.csv}\forestgina
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/limits/new_gina_random.csv}\randomgina
+
+\begin{tikzpicture}
+\begin{axis}[
+    enlarge x limits=0.2,
+    width=#1,
+    height=#2,
+    ymin=0,
+    xlabel=Размер пространства гиперпараметров,
+    ylabel=обратная оценка точности,
+    xtick=data,
+    scatter/classes={a={mark=o}},
+    legend style={at={(0.02,0.98)},anchor=north west},
+]
+
+\addplotsmac{\forestiris}{heusome}{2}{4}{5}
+\addplotsmac{\forestletter}{basicsome}{2}{4}{5}
+\addplotsmac{\forestgina}{gena}{2}{4}{5}
+\addplotsmac{\randomiris}{heuno}{2}{4}{5}
+\addplotsmac{\randomletter}{basicno}{2}{4}{5}
+\addplotsmac{\randomgina}{random}{2}{4}{5}
+
+\legend{%
+    iris,
+    leter,
+    gina-agnositc,
+}
+
+\end{axis}
+\end{tikzpicture}
+}
+
+\newcommand{\smaccount} [2] {%
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/iris_forest.csv}\forestiris
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/iris_random.csv}\randomiris
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/leter_forest.csv}\forestletter
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/leter_random.csv}\randomletter
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/gina_forest.csv}\forestgina
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/runcount/gina_random.csv}\randomgina
+
+\begin{tikzpicture}
+\begin{axis}[
+    enlarge x limits=0.2,
+    width=#1,
+    height=#2,
+    ymin=0,
+    xlabel=Количество запусков целевого алгоритма,
+    ylabel=обратная оценка точности,
+    xtick=data,
+    scatter/classes={a={mark=o}},
+]
+\addplotsmac{\forestiris}{heusome}{0}{3}{4}
+\addplotsmac{\forestletter}{basicsome}{0}{3}{4}
+\addplotsmac{\forestgina}{gena}{0}{3}{4}
+\addplotsmac{\randomiris}{heuno}{0}{3}{4}
+\addplotsmac{\randomletter}{basicno}{0}{3}{4}
+\addplotsmac{\randomgina}{random}{0}{3}{4}
+
+\legend{%
+    iris,
+    leter,
+    gina-agnositc,
+}
+
+\end{axis}
+\end{tikzpicture}
+}

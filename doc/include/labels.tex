@@ -1,0 +1,20 @@
+\usepackage{pgfplots, pgfplotstable}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=newest}
+
+\makeatletter
+\pgfplotsset{%
+    /pgfplots/flexible xticklabels from table/.code n args={3}{%
+        \pgfplotstableread[#3]{#1}\coordinate@table
+        \pgfplotstablegetcolumn{#2}\of{\coordinate@table}\to\pgfplots@xticklabels
+        \let\pgfplots@xticklabel=\pgfplots@user@ticklabel@list@x
+    }
+}
+\makeatother%
+\definecolor{basicno}{rgb}{0.624,0.0,0.0}
+\definecolor{basicsome}{rgb}{0.424,0.0,0.0}
+\definecolor{random}{rgb}{0.0,0.100,0.424}
+\definecolor{gena}{rgb}{0.0,0.100,0.624}
+\definecolor{heuno}{rgb}{0.2,0.524,0.2}
+\definecolor{heusome}{rgb}{0.2,0.424,0.2}
+\definecolor{heumore}{rgb}{0.1,0.324,0.1}

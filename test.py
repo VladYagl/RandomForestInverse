@@ -144,38 +144,48 @@ def run_other(X, y, name, algo="heuristic", error=0.0, iterations=1000, output=T
 
 # -----------------MASS TESTING---------------------------------------------------------------------------------------------------
 
-algos = [
-        ("basic", 0.0, 0),
-        ("basic", 0.05, 0),
-        ("random", 0.0, 1000000),
-        ("gena", 0.0, 1000),
-        ("heuristic", 0.0, 0),
-        ("heuristic", 0.05, 0),
-        ("heuristic", 0.15, 0),
-        ]
+# algos = [
+#         ("basic", 0.0, 0),
+#         ("basic", 0.05, 0),
+#         ("random", 0.0, 1000000),
+#         ("gena", 0.0, 1000),
+#         ("heuristic", 0.0, 0),
+#         ("heuristic", 0.05, 0),
+#         ("heuristic", 0.15, 0),
+#         ]
+
+algos = []
+for error in range(25):
+    algos.append(("heuristic", error / 100, 0))
 
 datasets = [
+        # (datasets.load_diabetes(), 70, None, "time_to_error/diabetes"),
+        # (datasets.fetch_openml(name="kin8nm"), 30, None, "time_to_error/kin8nm"),
+        (datasets.fetch_openml(name="house_8L"), 37, None, "time_to_error/house_8L"),
+        (datasets.fetch_openml(name="house_16H"), 20, None, "time_to_error/house_16H"),
+
         # (datasets.load_diabetes(), 20, None, "diabetes"),
         # (datasets.load_diabetes(), 50, None, "diabetes"),
         # (datasets.load_boston(), 30, None, "boston"),
         # (datasets.load_boston(), 100, None, "boston"),
         # (datasets.fetch_openml(name="autoPrice"), 30, None, "autoPrice"),
-        (datasets.fetch_openml(name="wisconsin"), 20, None, "wisconsin"),
-        (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
-        (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
-        (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
-        (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
-        (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
-        (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
-        (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
-        (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
-        (datasets.fetch_openml(name="mtp2"), 60, None, "mtp2"),
-        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
-        (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
+        # (datasets.fetch_openml(name="wisconsin"), 20, None, "wisconsin"),
+        # (datasets.fetch_openml(name="strikes"), 30, None, "strikes"),
+        # (datasets.fetch_openml(name="strikes"), 100, None, "strikes"),
+        # (datasets.fetch_openml(name="kin8nm"), 30, None, "kin8nm"),
+        # (datasets.fetch_openml(name="house_8L"), 30, None, "house_8L"),
+        # (datasets.fetch_openml(name="house_8L"), 30, 15, "house_8L"),
+        # (datasets.fetch_openml(name="house_16H"), 20, None, "house_16H"),
+        # (datasets.fetch_openml(name="house_16H"), 20, 15, "house_16H"),
+        # (datasets.fetch_openml(name="mtp2"), 30, None, "mtp2"),
+        # (datasets.fetch_openml(name="mtp2"), 60, None, "mtp2"),
+        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, None, "QSAR-TID-11617"),
+        # (datasets.fetch_openml(name="QSAR-TID-11617"), 30, 15, "QSAR-TID-11617"),
         ]
 
 n_tests = 10
-timeout = 240
+timeout = 600
+# timeout = 240
 # timeout = 20
 output_dir = "./data/datasets/"
 
@@ -227,6 +237,7 @@ for i, dataset in enumerate(datasets):
                     "%s-%lf-%d" % algo, np.mean(errors), np.std(errors), np.mean(times), np.std(times)
                 )
                 output.write(result + "\n")
+                output.flush()
                 print(result+"\t\t\t")
             except Exception as e:
                 output.write("%s,,,,\n" % ("%s-%lf-%d" % algo))

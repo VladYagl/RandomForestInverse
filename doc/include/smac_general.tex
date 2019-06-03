@@ -1,0 +1,34 @@
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/forest.csv}\forest
+\pgfplotstableread[col sep=comma, header=false]{../data/smac/random.csv}\random
+
+\begin{tikzpicture}
+\begin{axis}[
+    only marks,
+    enlarge x limits=0.01,
+    % ybar=0pt, 
+    width=\graphwidth,
+    height=\graphheight,
+    % bar width=8pt,
+    ymin=0,
+    xlabel=Random Forest \hspace{3em} Decision Tree \hspace{3em} SGD \hspace{1em}.,
+    ylabel=обратная оценка точности,
+    xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+    xtick=data,
+    scatter/classes={a={mark=o}},
+]
+\addplot 
+    [scatter, color=heuno]
+    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+    table[x expr=\coordindex, y index=3, y error index=4]{\random};
+\addplot 
+    [scatter, color=basicno]
+    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+    table[x expr=\coordindex, y index=3, y error index=4]{\forest};
+
+\legend{%
+    Оригинал, 
+    Модификация,
+}
+
+\end{axis}
+\end{tikzpicture}

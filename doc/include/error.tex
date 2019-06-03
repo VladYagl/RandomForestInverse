@@ -1,0 +1,73 @@
+\newcommand{\addploterror}[2] {% 
+\addplot 
+    [color=#2, fill=#2, fill opacity=0.33]
+    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit] 
+    table[x expr=\coordindex, y=mean_error, y error=std_error]{#1}; 
+}
+
+\newenvironment{erroraxis}[2] {% 
+\begin{axis}[
+    ytick={0,0.1,...,0.9},
+    enlarge x limits=0.2,
+    ybar=0pt, 
+    width=#1,
+    height=#2,
+    bar width=8pt,
+    ymin=0,
+    xlabel=Датасет,
+    ylabel=Отоносительная погрешность,
+    flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
+    xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+    xtick=data,
+    legend style={at={(0.02,0.98)},anchor=north west},
+]
+}{%
+\end{axis}
+}
+
+\newcommand{\errorbig}[2] {%
+\pgfplotstableread[col sep=comma]{../data/extra/heuristic-05.csv}\heusome
+\pgfplotstableread[col sep=comma]{../data/extra/heuristic-15.csv}\heumore
+\pgfplotstableread[col sep=comma]{../data/extra/random.csv}\random
+
+\begin{tikzpicture}
+\begin{erroraxis}{#1}{#2}
+
+\addploterror{\random}{random} 
+\addploterror{\heusome}{heusome}
+\addploterror{\heumore}{heumore}
+
+\legend{%
+    Случайный, 
+    Эвристика с $<5\%$, 
+    Эвристика с $<15\%$ 
+}
+
+\end{erroraxis}
+\end{tikzpicture} 
+}
+
+\newcommand{\erroreasy}[2] {%
+\pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
+\pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
+\pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
+\pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
+
+\begin{tikzpicture} 
+\begin{erroraxis}{#1}{#2}
+
+\addploterror{\basicsome}{basicsome}
+\addploterror{\random}{random}
+\addploterror{\heusome}{heusome}
+\addploterror{\heusome}{heumore}
+
+\legend{%
+    Перебор с $<5\%$, 
+    Случайный, 
+    Эвристика с $<5\%$, 
+    Эвристика с $<15\%$ 
+}
+
+\end{erroraxis}
+\end{tikzpicture}
+}

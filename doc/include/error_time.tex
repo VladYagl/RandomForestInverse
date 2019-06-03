@@ -1,0 +1,47 @@
+\newcommand{\errortimeaddplot}[2] {%
+\addplot 
+    [scatter, color=#2, style={ultra thick}] 
+    table[x=algo, y=mean_time]{#1};
+\addplot 
+    [name path=upper, color=#2] 
+    table[x=algo, y expr=\thisrow{mean_time}-\thisrow{std_time}]{#1};
+\addplot 
+    [name path=lower, color=#2] 
+    table[x=algo, y expr=\thisrow{mean_time}+\thisrow{std_time}]{#1};
+\addplot 
+    [fill, fill opacity=0.2, color=#2] 
+    fill between[of=upper and lower];
+}
+
+\newcommand{\errortotime}[2] {%
+\pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/diabetes70-None.csv}\diabet
+\pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/kin8nm30-None.csv}\kinmerrtime
+% \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/house_8L37-None.csv}\house
+
+\begin{tikzpicture}
+\begin{axis}[
+    xtick={0.00,0.05,0.10,0.15,0.20,0.25},
+    x tick label style={/pgf/number format/.cd,
+            fixed, fixed zerofill, precision=2, /tikz/.cd},
+    enlarge x limits=0.2,
+    width=#1,
+    height=#2,
+    ymin=0,
+    xlabel=Заданная допутсимая погрешность алгоритма,
+    ylabel=Время работы в сек.,
+    scatter/classes={a={mark=o}},
+]
+
+\errortimeaddplot{\diabet}{heusome}
+\errortimeaddplot{\kinmerrtime}{basicno}
+% \errortimeaddplot{\house}{random}
+
+\legend{%
+    diabetes-70 деревьев,,,,
+    kin8nm-30 деревьев,,,,
+    house\_8L-37 деревьев,
+}
+
+\end{axis}
+\end{tikzpicture}
+}

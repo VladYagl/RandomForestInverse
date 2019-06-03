@@ -1,0 +1,118 @@
+\newcommand{\addplottime} [2] {%
+\addplot 
+    [color=#2, fill=#2, fill opacity=0.33]
+    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
+    table[x expr=\coordindex, y=mean_time, y error=std_time]{#1};
+}
+
+\newenvironment{timeaxis} [2] {%
+\begin{axis}[
+    enlarge x limits=0.2,
+    ybar=0pt, 
+    width=#1,
+    height=#2,
+    bar width=8pt,
+    ymin=0,
+    xlabel=Датасет,
+    ylabel=Время работы в сек,
+    flexible xticklabels from table={../data/big/heuristic-15.csv}{algo}{col sep=comma},
+    xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
+    xtick=data,
+    % legend style={at={(0.02,0.98)},anchor=north west},
+]
+}{%
+\end{axis}
+}
+
+\newcommand{\timebig} [2] {%
+\pgfplotstableread[col sep=comma]{../data/big/basic-00.csv}\basicno
+\pgfplotstableread[col sep=comma]{../data/big/basic-05.csv}\basicsome
+\pgfplotstableread[col sep=comma]{../data/big/heuristic-00.csv}\heuno
+\pgfplotstableread[col sep=comma]{../data/big/heuristic-05.csv}\heusome
+\pgfplotstableread[col sep=comma]{../data/big/heuristic-15.csv}\heumore
+\pgfplotstableread[col sep=comma]{../data/big/random.csv}\random
+
+\begin{tikzpicture}
+\begin{timeaxis}{#1}{#2}
+
+\addplottime{\basicno}{basicno}
+\addplottime{\basicsome}{basicsome}
+\addplottime{\random}{random}
+\addplottime{\heuno}{heuno}
+\addplottime{\heusome}{heusome}
+\addplottime{\heumore}{heumore}
+
+\legend{%
+    Перебор, 
+    Перебор с $<5\%$, 
+    Случайный, 
+    Эвристика, 
+    Эвристика с $<5\%$, 
+    Эвристика с $<15\%$ 
+}
+
+\end{timeaxis}
+\end{tikzpicture}
+}
+
+\newcommand{\timeeasy} [2] {%
+\pgfplotstableread[col sep=comma]{../data/easy/basic-00.csv}\basicno
+\pgfplotstableread[col sep=comma]{../data/easy/basic-05.csv}\basicsome
+\pgfplotstableread[col sep=comma]{../data/easy/heuristic-00.csv}\heuno
+\pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
+\pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
+\pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
+
+\begin{tikzpicture}
+\begin{timeaxis}{#1}{#2}
+
+\addplottime{\basicno}{basicno}
+\addplottime{\basicsome}{basicsome}
+\addplottime{\random}{random}
+\addplottime{\heuno}{heuno}
+\addplottime{\heusome}{heusome}
+\addplottime{\heumore}{heumore}
+
+\legend{%
+    Перебор, 
+    Перебор с $<5\%$, 
+    Случайный, 
+    Эвристика, 
+    Эвристика с $<5\%$, 
+    Эвристика с $<15\%$ 
+}
+
+\end{timeaxis}
+\end{tikzpicture}
+}
+
+\newcommand{\timetrees} [2] {%
+\pgfplotstableread[col sep=comma]{../data/trees/basic-00.csv}\basicno
+\pgfplotstableread[col sep=comma]{../data/trees/basic-05.csv}\basicsome
+\pgfplotstableread[col sep=comma]{../data/trees/heuristic-00.csv}\heuno
+\pgfplotstableread[col sep=comma]{../data/trees/heuristic-05.csv}\heusome
+\pgfplotstableread[col sep=comma]{../data/trees/heuristic-15.csv}\heumore
+\pgfplotstableread[col sep=comma]{../data/trees/random.csv}\random
+
+\begin{tikzpicture}
+\begin{timeaxis}{#1}{#2}
+
+% \addplottime{\basicno}{basicno}
+% \addplottime{\basicsome}{basicsome}
+\addplottime{\random}{random}
+\addplottime{\heuno}{heuno}
+\addplottime{\heusome}{heusome}
+\addplottime{\heumore}{heumore}
+
+\legend{%
+    % Перебор, 
+    % Перебор с $<5\%$, 
+    Случайный, 
+    Эвристика, 
+    Эвристика с $<5\%$, 
+    Эвристика с $<15\%$ 
+}
+
+\end{timeaxis}
+\end{tikzpicture}
+}
