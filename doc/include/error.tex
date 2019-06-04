@@ -5,7 +5,7 @@
     table[x expr=\coordindex, y=mean_error, y error=std_error]{#1}; 
 }
 
-\newenvironment{erroraxis}[2] {% 
+\newenvironment{erroraxis}[3] {% 
 \begin{axis}[
     ytick={0,0.1,...,0.9},
     enlarge x limits=0.2,
@@ -16,7 +16,7 @@
     ymin=0,
     xlabel=Датасет,
     ylabel=Отоносительная погрешность,
-    flexible xticklabels from table={../data/easy/heuristic-15.csv}{algo}{col sep=comma},
+    flexible xticklabels from table={#3}{algo}{col sep=comma},
     xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
     xtick=data,
     legend style={at={(0.02,0.98)},anchor=north west},
@@ -31,7 +31,7 @@
 \pgfplotstableread[col sep=comma]{../data/extra/random.csv}\random
 
 \begin{tikzpicture}
-\begin{erroraxis}{#1}{#2}
+\begin{erroraxis}{#1}{#2}{../data/extra/heuristic-15.csv}
 
 \addploterror{\random}{random} 
 \addploterror{\heusome}{heusome}
@@ -54,7 +54,7 @@
 \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
 
 \begin{tikzpicture} 
-\begin{erroraxis}{#1}{#2}
+\begin{erroraxis}{#1}{#2}{../data/easy/heuristic-15.csv}
 
 \addploterror{\basicsome}{basicsome}
 \addploterror{\random}{random}

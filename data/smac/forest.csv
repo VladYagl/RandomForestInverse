@@ -1,15 +1,15 @@
-honest, Random Forest, iris, 0.035333, 0.005207
-honest, Random Forest, credit-g, 0.300000, 0.000000
-honest, Random Forest, monks-problems-2, 0.342755, 0.000000
-honest, Random Forest, letter, 0.174975, 0.069393
-honest, Random Forest, gina-agnostic, 0.099880, 0.013053
-honest, Desicion Tree, iris, 0.059333, 0.002000
-honest, Desicion Tree, credit-g, 0.297200, 0.008400
-honest, Desicion Tree, monks-problems-2, 0.342755, 0.000000
-honest, Desicion Tree, letter, 0.297075, 0.095791
-honest, Desicion Tree, gina-agnostic, 0.146222, 0.019468
-honest, SGD, iris, 0.018000, 0.005207
-honest, SGD, credit-g, 0.305600, 0.009583
-honest, SGD, monks-problems-2, 0.341923, 0.002496
-honest, SGD, letter, 0.332942, 0.011957
-honest, SGD, gina-agnostic, 0.165599, 0.002895
+Random Forest, iris, 0.035333, 0.005207
+Random Forest, credit-g, 0.300000, 0.000000
+Random Forest, monks, 0.342755, 0.000000
+Random Forest, letter, 0.174975, 0.069393
+Random Forest, gina, 0.099880, 0.013053
+Desicion Tree, iris, 0.059333, 0.002000
+Desicion Tree, credit-g, 0.297200, 0.008400
+Desicion Tree, monks, 0.342755, 0.000000
+Desicion Tree, letter, 0.297075, 0.095791
+Desicion Tree, gina, 0.146222, 0.019468
+SGD, iris, 0.018000, 0.005207
+SGD, credit-g, 0.305600, 0.009583
+SGD, monks, 0.341923, 0.002496
+SGD, letter, 0.332942, 0.011957
+SGD, gina, 0.165599, 0.002895

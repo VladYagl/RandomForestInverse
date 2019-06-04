@@ -1,34 +1,63 @@
+\newcommand{\smacgeneral}{%
 \pgfplotstableread[col sep=comma, header=false]{../data/smac/forest.csv}\forest
 \pgfplotstableread[col sep=comma, header=false]{../data/smac/random.csv}\random
 
-\begin{tikzpicture}
-\begin{axis}[
-    only marks,
-    enlarge x limits=0.01,
-    % ybar=0pt, 
-    width=\graphwidth,
-    height=\graphheight,
-    % bar width=8pt,
-    ymin=0,
-    xlabel=Random Forest \hspace{3em} Decision Tree \hspace{3em} SGD \hspace{1em}.,
-    ylabel=обратная оценка точности,
-    xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
-    xtick=data,
-    scatter/classes={a={mark=o}},
-]
-\addplot 
-    [scatter, color=heuno]
-    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-    table[x expr=\coordindex, y index=3, y error index=4]{\random};
-\addplot 
-    [scatter, color=basicno]
-    plot [error bars/.cd, error bar style={line width=1pt}, y dir = both, y explicit]
-    table[x expr=\coordindex, y index=3, y error index=4]{\forest};
+\pgfplotstablecreatecol[copy column from table={\random}{[index] 2}] {4} {\forest}
+\pgfplotstablecreatecol[copy column from table={\random}{[index] 3}] {5} {\forest}
 
-\legend{%
-    Оригинал, 
-    Модификация,
+\pgfplotstabletypeset[
+    every head row/.style={%
+        output empty row,
+        before row={%
+            \hline
+            \multicolumn{1}{|c}{Алгоритм} & \multicolumn{1}{|c}{Датасет} &
+            \multicolumn{3}{|c}{Модификация} & \multicolumn{3}{|c|}{Оригинал} \\
+        },
+    },
+    before row=\hline,
+    every last row/.style={after row=\hline},
+    columns={0, 1, forestacc, plusminus, 3, randomacc, plusminus, 5},
+    display columns/0/.style= {%
+            column name=Алгоритм,
+            string type,
+            column type = {|c|},
+    },
+    create on use/plusminus/.style={create col/set={$\pm$}},
+    columns/plusminus/.style= {column name=, string type, column type = {b{0mm}}},
+    display columns/1/.style= {%
+            column name=Выборка,
+            string type,
+            column type = {c|},
+    },
+    create on use/forestacc/.style={%
+        create col/expr={1-\thisrow{2}}
+    },
+    columns/forestacc/.style= {%
+            column name=,
+            fixed,
+            precision=2,
+            column type = {b{6mm}},
+    },
+    columns/3/.style= {%
+            column name=,
+            fixed,
+            precision=2,
+            column type = {l|},
+    },
+    create on use/randomacc/.style={%
+        create col/expr={1-\thisrow{4}}
+    },
+    columns/randomacc/.style= {%
+            column name=,
+            fixed,
+            precision=2,
+            column type = {b{6mm}},
+    },
+    columns/5/.style= {%
+            column name=,
+            fixed,
+            precision=2,
+            column type = {l|},
+    },
+]{\forest}
 }
-
-\end{axis}
-\end{tikzpicture}

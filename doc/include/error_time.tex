@@ -16,7 +16,7 @@
 \newcommand{\errortotime}[2] {%
 \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/diabetes70-None.csv}\diabet
 \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/kin8nm30-None.csv}\kinmerrtime
-% \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/house_8L37-None.csv}\house
+\pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/house_8L37-None.csv}\house
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -34,7 +34,7 @@
 
 \errortimeaddplot{\diabet}{heusome}
 \errortimeaddplot{\kinmerrtime}{basicno}
-% \errortimeaddplot{\house}{random}
+\errortimeaddplot{\house}{random}
 
 \legend{%
     diabetes-70 деревьев,,,,

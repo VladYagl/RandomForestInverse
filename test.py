@@ -161,8 +161,8 @@ for error in range(25):
 datasets = [
         # (datasets.load_diabetes(), 70, None, "time_to_error/diabetes"),
         # (datasets.fetch_openml(name="kin8nm"), 30, None, "time_to_error/kin8nm"),
-        (datasets.fetch_openml(name="house_8L"), 37, None, "time_to_error/house_8L"),
-        (datasets.fetch_openml(name="house_16H"), 20, None, "time_to_error/house_16H"),
+        # (datasets.fetch_openml(name="house_8L"), 37, None, "time_to_error/house_8L"),
+        (datasets.fetch_openml(name="house_16H"), 25, None, "time_to_error/house_16H"),
 
         # (datasets.load_diabetes(), 20, None, "diabetes"),
         # (datasets.load_diabetes(), 50, None, "diabetes"),
