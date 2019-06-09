@@ -5,12 +5,20 @@
 \pgfplotstablecreatecol[copy column from table={\random}{[index] 2}] {4} {\forest}
 \pgfplotstablecreatecol[copy column from table={\random}{[index] 3}] {5} {\forest}
 
+\pgfplotstableset{%
+    bold/.style = {%
+        postproc cell content/.style={%
+            @cell content/.add={\boldmath}{},
+        },
+    },
+}
+
 \pgfplotstabletypeset[
     every head row/.style={%
         output empty row,
         before row={%
             \hline
-            \multicolumn{1}{|c}{Алгоритм} & \multicolumn{1}{|c}{Датасет} &
+            \multicolumn{1}{|c}{Алгоритм} & \multicolumn{1}{|c}{Набор данных} &
             \multicolumn{3}{|c}{Модификация} & \multicolumn{3}{|c|}{Оригинал} \\
         },
     },
@@ -59,5 +67,26 @@
             precision=2,
             column type = {l|},
     },
+    every row 0 column 2/.style = {bold},
+    every row 3 column 2/.style = {bold},
+    every row 4 column 2/.style = {bold},
+    every row 5 column 2/.style = {bold},
+    every row 8 column 2/.style = {bold},
+    every row 9 column 2/.style = {bold},
+    every row 13 column 2/.style = {bold},
+    every row 0 column 3/.style = {bold},
+    every row 3 column 3/.style = {bold},
+    every row 4 column 3/.style = {bold},
+    every row 5 column 3/.style = {bold},
+    every row 8 column 3/.style = {bold},
+    every row 9 column 3/.style = {bold},
+    every row 13 column 3/.style = {bold},
+    every row 0 column 4/.style = {bold},
+    every row 3 column 4/.style = {bold},
+    every row 4 column 4/.style = {bold},
+    every row 5 column 4/.style = {bold},
+    every row 8 column 4/.style = {bold},
+    every row 9 column 4/.style = {bold},
+    every row 13 column 4/.style = {bold},
 ]{\forest}
 }

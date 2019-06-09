@@ -17,6 +17,7 @@
 \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/diabetes70-None.csv}\diabet
 \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/kin8nm30-None.csv}\kinmerrtime
 \pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/house_8L37-None.csv}\house
+\pgfplotstableread[col sep=comma]{../data/datasets/time_to_error/house_16H25-None.csv}\housebig
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -32,14 +33,16 @@
     scatter/classes={a={mark=o}},
 ]
 
-\errortimeaddplot{\diabet}{heusome}
-\errortimeaddplot{\kinmerrtime}{basicno}
-\errortimeaddplot{\house}{random}
+\errortimeaddplot{\diabet}{violet}
+\errortimeaddplot{\kinmerrtime}{random}
+\errortimeaddplot{\house}{basicno}
+\errortimeaddplot{\housebig}{heuno}
 
 \legend{%
     diabetes-70 деревьев,,,,
     kin8nm-30 деревьев,,,,
-    house\_8L-37 деревьев,
+    house\_8L-37 деревьев,,,,
+    house\_16H-25 деревьев,,
 }
 
 \end{axis}

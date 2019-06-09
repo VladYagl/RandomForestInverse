@@ -14,11 +14,12 @@
     height=#2,
     bar width=8pt,
     ymin=0,
-    xlabel=Датасет,
+    xlabel=Набор данных,
     ylabel=Отоносительная погрешность,
     flexible xticklabels from table={#3}{algo}{col sep=comma},
     xticklabel style={text height=1.5ex, font=\tiny}, % To make sure the text labels are nicely aligned
     xtick=data,
+    legend cell align={left},
     legend style={at={(0.02,0.98)},anchor=north west},
 ]
 }{%
@@ -39,8 +40,8 @@
 
 \legend{%
     Случайный, 
-    Эвристика с $<5\%$, 
-    Эвристика с $<15\%$ 
+    Ветви/границы + эвристика с $<5\%$, 
+    Ветви/границы + эвристика с $<15\%$ 
 }
 
 \end{erroraxis}
@@ -52,20 +53,23 @@
 \pgfplotstableread[col sep=comma]{../data/easy/heuristic-05.csv}\heusome
 \pgfplotstableread[col sep=comma]{../data/easy/heuristic-15.csv}\heumore
 \pgfplotstableread[col sep=comma]{../data/easy/random.csv}\random
+\pgfplotstableread[col sep=comma]{../data/easy/gena.csv}\gena
 
 \begin{tikzpicture} 
 \begin{erroraxis}{#1}{#2}{../data/easy/heuristic-15.csv}
 
-\addploterror{\basicsome}{basicsome}
 \addploterror{\random}{random}
+\addploterror{\gena}{gena}
+\addploterror{\basicsome}{basicsome}
 \addploterror{\heusome}{heusome}
 \addploterror{\heusome}{heumore}
 
 \legend{%
-    Перебор с $<5\%$, 
     Случайный, 
-    Эвристика с $<5\%$, 
-    Эвристика с $<15\%$ 
+    Метод имитации отжига, 
+    Ветви/границы с $<5\%$, 
+    Ветви/границы + эвристика с $<5\%$, 
+    Ветви/границы + эвристика с $<15\%$ 
 }
 
 \end{erroraxis}
