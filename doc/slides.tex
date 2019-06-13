@@ -11,14 +11,18 @@
 \usepackage{amssymb,amsmath}
 \usepackage{pgfplots, pgfplotstable}
 \pgfplotsset{compat=newest}
-\input{./include/labels.tex}
-\newcommand{\graphwidth}{\textwidth}
-\newcommand{\graphheight}{0.8\textheight}
 
 \graphicspath{{logo/}{pics/}}
 \beamertemplatenavigationsymbolsempty{}
 \setbeamertemplate{footline}[frame number]
 \setbeamerfont{footline}{size={\fontsize{10}{12}}}
+
+\input{./include/labels.tex}
+\input{./include/time.tex}
+\input{./include/error.tex}
+\input{./include/error_time.tex}
+\input{./include/smac.tex}
+\input{./include/smac_general.tex}
 
 \title{Оптимизация функции, задаваемой регрессионным лесом}
 \author{Влад Ягламунов}
@@ -92,7 +96,7 @@
     }
 \end{frame}
 
-\begin{frame} \frametitle{Эвристический алгоритм}
+\begin{frame} \frametitle{Метода ветвей и границ}
     \begin{columns}
         \column{.5\textwidth}
             \begin{itemize}
@@ -109,7 +113,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame} \frametitle{Эвристический алгоритм}
+\begin{frame} \frametitle{Метода ветвей и границ | Эвристика}
 
     \begin{columns}
         \column{.75\textwidth}
@@ -127,7 +131,7 @@
     \]
 \end{frame}
 
-\begin{frame} \frametitle{Эвристический алгоритм (Оптимизация 1)}
+\begin{frame} \frametitle{Метод ветвей и границ | Оптимизация 1}
     Необязательно искать точное решение.
 
     \vspace{50px}
@@ -140,7 +144,7 @@
     Гарантирует погрешность $<\alpha$
 \end{frame}
 
-\begin{frame} \frametitle{Эвристический алгоритм (Оптимизация 2)}
+\begin{frame} \frametitle{Метод ветвей и границ | Оптимизация 2}
     Максимум в поддереве может не пересекаться с текущей областью
 
     \begin{columns}
@@ -156,12 +160,13 @@
 
 \begin{frame} \frametitle{Сравниваемые алгоритмы}
     \begin{itemize}
-        \item Перебор
-        \item Перебор с погрешностью $<5\%$
+        \item Метод ветвей и границ 
+        \item Метод ветвей и границ с погрешностью $<5\%$
         \item Случайный
-        \item Эвристика
-        \item Эвристика с погрешностью $<5\%$
-        \item Эвристика с погрешностью $<15\%$
+        \item Отжиг
+        \item Метод ветвей и границ с применением эвристики
+        \item Метод ветвей и границ с применением эвристики и с погрешностью $<5\%$
+        \item Метод ветвей и границ с применением эвристики и с погрешностью $<15\%$
     \end{itemize}
 \end{frame}
 
@@ -178,31 +183,31 @@
 
 \begin{frame} \frametitle{Тестирование (Время работы | Простой случай)}
     \begin{center}
-        \input{./include/time_easy.tex}
+        \timeeasy{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Много деревьев)}
     \begin{center}
-        \input{./include/time_trees.tex}
+        \timetrees{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Время работы | Большой датасет)}
     \begin{center}
-        \input{./include/time_big.tex}
+        \timebig{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Погрешность | Простой случай)}
     \begin{center}
-        \input{./include/error_easy.tex}
+        \erroreasy{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование (Погрешность | Много признаков)}
     \begin{center}
-        \input{./include/error_big.tex}
+        \errorbig{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
@@ -220,19 +225,19 @@
 
 \begin{frame} \frametitle{Тестирование | SMAC}
     \begin{center}
-        \input{./include/smac_general.tex}
+        \smacgeneral
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование | SMAC, размер пространства}
     \begin{center}
-        \input{./include/smac_size.tex}
+        \smacsize{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
 \begin{frame} \frametitle{Тестирование | SMAC, количество запусков алгоритма}
     \begin{center}
-        \input{./include/smac_count.tex}
+        \smaccount{1\textwidth}{0.9\textheight}
     \end{center}
 \end{frame}
 
